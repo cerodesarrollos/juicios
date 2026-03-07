@@ -126,3 +126,26 @@ export interface CaseSummary {
   evidence_pending: number
   total_transcriptions: number
 }
+
+export interface SharedLink {
+  id: string
+  case_id: string
+  token: string
+  expires_at: string | null
+  created_at: string
+}
+
+export interface ActivityLog {
+  id: string
+  case_id: string
+  action: string
+  entity_type: string | null
+  entity_id: string | null
+  description: string
+  created_at: string
+}
+
+export type TransactionWithParties = Transaction & {
+  from_party: { name: string } | null
+  to_party: { name: string } | null
+}
