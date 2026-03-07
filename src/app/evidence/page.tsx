@@ -21,8 +21,8 @@ export default async function EvidencePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Evidencia</h1>
-        <p className="mt-1 text-sm text-text-muted">{evidence?.length ?? 0} archivos registrados</p>
+        <h1 className="text-2xl font-bold text-gray-900">Evidencia</h1>
+        <p className="mt-1 text-sm text-gray-500">{evidence?.length ?? 0} archivos registrados</p>
       </div>
       <EvidenceView
         evidence={evidence ?? []}

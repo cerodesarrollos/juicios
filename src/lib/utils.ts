@@ -10,11 +10,11 @@ export function formatDate(date: string | null | undefined): string {
 
 export function statusColor(status: string): string {
   switch (status) {
-    case 'cumplido': return 'text-accent'
-    case 'incumplido': return 'text-danger'
-    case 'pendiente': return 'text-warning'
-    case 'parcial': return 'text-info'
-    default: return 'text-text-muted'
+    case 'cumplido': return 'text-green-700'
+    case 'incumplido': return 'text-red-700'
+    case 'pendiente': return 'text-yellow-600'
+    case 'parcial': return 'text-blue-600'
+    default: return 'text-gray-500'
   }
 }
 
@@ -28,25 +28,35 @@ export function statusBadge(status: string): string {
   }
 }
 
+export function statusBadgeClass(status: string): string {
+  switch (status) {
+    case 'cumplido': return 'bg-green-100 text-green-700'
+    case 'incumplido': return 'bg-red-100 text-red-700'
+    case 'pendiente': return 'bg-gray-100 text-gray-600'
+    case 'parcial': return 'bg-yellow-100 text-yellow-700'
+    default: return 'bg-gray-100 text-gray-600'
+  }
+}
+
 export function typeColor(type: string): string {
   switch (type) {
     case 'pago':
     case 'cuota':
-      return 'bg-green-500/20 text-green-400'
+      return 'bg-green-100 text-green-700'
     case 'incumplimiento':
-      return 'bg-red-500/20 text-red-400'
+      return 'bg-red-100 text-red-700'
     case 'servicio':
     case 'informe':
-      return 'bg-blue-500/20 text-blue-400'
+      return 'bg-blue-100 text-blue-700'
     case 'acuerdo':
     case 'ajuste':
-      return 'bg-yellow-500/20 text-yellow-400'
+      return 'bg-yellow-100 text-yellow-700'
     case 'devolucion':
-      return 'bg-purple-500/20 text-purple-400'
+      return 'bg-purple-100 text-purple-700'
     case 'mercaderia':
-      return 'bg-orange-500/20 text-orange-400'
+      return 'bg-orange-100 text-orange-700'
     default:
-      return 'bg-zinc-500/20 text-zinc-400'
+      return 'bg-gray-100 text-gray-600'
   }
 }
 
