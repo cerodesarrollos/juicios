@@ -152,3 +152,23 @@ export type TransactionWithParties = Transaction & {
   from_party: { name: string } | null
   to_party: { name: string } | null
 }
+
+export interface ChatEvidence {
+  id: string
+  case_id: string
+  evidence_id: string
+  chapter: number
+  chapter_name: string
+  message_date: string
+  sender: string
+  message_type: string
+  message_text: string | null
+  file_name: string | null
+  transcription: string | null
+  is_key_evidence: boolean
+  is_weak_point: boolean
+  weak_point_note: string | null
+  notes: string | null
+  sort_order: number
+  created_at: string
+}

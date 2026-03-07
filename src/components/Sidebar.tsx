@@ -34,6 +34,8 @@ export default function Sidebar() {
     { label: 'Configuracion', tab: 'config' },
   ]
 
+  const isChatPage = pathname.includes('/chat')
+
   return (
     <aside className="no-print fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4">
@@ -74,6 +76,16 @@ export default function Sidebar() {
                   <span>{item.label}</span>
                 </Link>
               ))}
+              <Link
+                href={`/case/${caseSlug}/chat`}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isChatPage
+                    ? 'bg-green-50 text-green-800 font-semibold'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <span>&#128172; Chat</span>
+              </Link>
             </div>
           </div>
         )}
