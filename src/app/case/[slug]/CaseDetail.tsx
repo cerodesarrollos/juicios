@@ -309,14 +309,14 @@ export default function CaseDetail({ caseData, transactions, evidence, parties, 
                               {EVIDENCE_SLOTS.map(slot => {
                                 const ev = txEvidence.find(e => e.slot === slot)
                                 const trans = ev ? transcriptionMap[ev.id] : undefined
-                                const isAudio = ev?.mime_type?.startsWith('audio/')
+                                const isAudio = ev?.file_type?.startsWith('audio/')
                                 return (
                                   <div key={slot} className="rounded-xl border border-gray-200 bg-white p-3 space-y-2">
                                     <p className="text-xs font-medium text-gray-500">{evidenceSlotLabel(slot)}</p>
                                     {ev && ev.status === 'adjuntado' ? (
                                       <>
                                         <p className="text-xs text-green-600">{evidenceStatusBadge(ev.status)}</p>
-                                        <p className="truncate text-xs text-gray-400">{ev.file_name}</p>
+                                        <p className="truncate text-xs text-gray-400">{ev.original_filename}</p>
                                         {isAudio && ev.file_url && (
                                           <AudioPlayer src={ev.file_url} transcription={trans?.text} />
                                         )}
@@ -369,20 +369,20 @@ export default function CaseDetail({ caseData, transactions, evidence, parties, 
               {evidence.map(ev => {
                 const tx = transactions.find(t => t.id === ev.transaction_id)
                 const trans = transcriptionMap[ev.id]
-                const isAudio = ev.mime_type?.startsWith('audio/')
-                const isImage = ev.mime_type?.startsWith('image/')
+                const isAudio = ev.file_type?.startsWith('audio/')
+                const isImage = ev.file_type?.startsWith('image/')
                 return (
                   <div key={ev.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="rounded-lg bg-green-800 px-2.5 py-1 text-xs font-semibold text-white">
-                        {ev.proof_id ?? tx?.proof_id ?? '—'}
+                        {tx?.proof_id ?? '—'}
                       </span>
                       <span className="text-xs">{evidenceStatusBadge(ev.status)}</span>
                     </div>
-                    <p className="text-sm text-gray-500">{evidenceSlotLabel(ev.slot)}</p>
-                    <p className="truncate text-sm text-gray-900">{ev.file_name}</p>
+                    <p className="text-sm text-gray-500">{evidenceSlotLabel(ev.slot ?? "")}</p>
+                    <p className="truncate text-sm text-gray-900">{ev.original_filename}</p>
                     {isImage && ev.file_url && (
-                      <img src={ev.file_url} alt={ev.file_name} className="mt-2 rounded-lg max-h-40 object-cover w-full" />
+                      <img src={ev.file_url} alt={ev.original_filename ?? ""} className="mt-2 rounded-lg max-h-40 object-cover w-full" />
                     )}
                     {isAudio && ev.file_url && (
                       <AudioPlayer src={ev.file_url} transcription={trans?.text} />

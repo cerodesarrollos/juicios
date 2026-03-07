@@ -6,12 +6,13 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { data, error } = await supabaseServer
     .from('evidence')
     .update({
-      file_name: body.file_name,
+      title: body.title,
+      description: body.description,
       file_path: body.file_path,
       file_url: body.file_url,
-      mime_type: body.mime_type,
+      file_type: body.file_type,
+      original_filename: body.original_filename,
       status: body.status,
-      notes: body.notes,
     })
     .eq('id', params.id)
     .select()

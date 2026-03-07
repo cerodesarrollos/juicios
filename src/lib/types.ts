@@ -78,15 +78,18 @@ export interface Evidence {
   id: string
   case_id: string
   transaction_id: string | null
-  proof_id: string | null
-  slot: string
-  type: string
-  file_name: string
-  file_path: string
+  evidence_type: string
+  title: string
+  description: string | null
+  file_path: string | null
   file_url: string | null
-  mime_type: string | null
+  file_type: string | null
+  file_size_bytes: number | null
+  original_source: string | null
+  original_date: string | null
+  original_filename: string | null
   status: string
-  notes: string | null
+  slot: string | null
   created_at: string
 }
 

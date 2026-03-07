@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
-  const filePath = `case-files/${caseSlug}/${proofId}/${slot}/${file.name}`
+  const filePath = `${caseSlug}/${proofId}/${slot}/${file.name}`
 
   const { error: uploadError } = await supabaseServer.storage
     .from('case-files')
@@ -29,15 +29,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
-  const { data: urlData } = supabaseServer.storage
+  // Get signed URL (bucket is private)
+  const { data: urlData } = await supabaseServer.storage
     .from('case-files')
-    .getPublicUrl(filePath)
+    .createSignedUrl(filePath, 60 * 60 * 24 * 365) // 1 year
 
-  // Determine type from mime
+  const fileUrl = urlData?.signedUrl || ''
+
+  // Map mime to evidence_type enum
   let evidenceType = 'documento'
-  if (file.type.startsWith('image/')) evidenceType = 'imagen'
+  if (file.type.startsWith('image/')) evidenceType = 'foto'
   else if (file.type.startsWith('audio/')) evidenceType = 'audio'
-  else if (file.type === 'application/pdf') evidenceType = 'pdf'
+  else if (file.type.startsWith('video/')) evidenceType = 'video'
+  else if (file.type === 'application/pdf') evidenceType = 'documento'
+
+  // Map slot to evidence_type if more specific
+  if (slot === 'comprobante') evidenceType = 'comprobante'
+  else if (slot === 'captura') evidenceType = 'captura'
+  else if (slot === 'audio') evidenceType = 'audio'
 
   // Check if evidence record already exists for this slot+transaction
   const { data: existing } = await supabaseServer
@@ -53,12 +62,14 @@ export async function POST(req: NextRequest) {
     const { data } = await supabaseServer
       .from('evidence')
       .update({
-        file_name: file.name,
+        title: `${proofId} — ${slot}`,
         file_path: filePath,
-        file_url: urlData.publicUrl,
-        mime_type: file.type,
+        file_url: fileUrl,
+        file_type: file.type,
+        file_size_bytes: file.size,
+        original_filename: file.name,
         status: 'adjuntado',
-        type: evidenceType,
+        evidence_type: evidenceType,
       })
       .eq('id', existing.id)
       .select()
@@ -70,14 +81,15 @@ export async function POST(req: NextRequest) {
       .insert({
         case_id: caseId,
         transaction_id: transactionId,
-        proof_id: proofId,
-        slot,
-        type: evidenceType,
-        file_name: file.name,
+        evidence_type: evidenceType,
+        title: `${proofId} — ${slot}`,
         file_path: filePath,
-        file_url: urlData.publicUrl,
-        mime_type: file.type,
+        file_url: fileUrl,
+        file_type: file.type,
+        file_size_bytes: file.size,
+        original_filename: file.name,
         status: 'adjuntado',
+        slot,
       })
       .select()
       .single()

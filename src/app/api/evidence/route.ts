@@ -8,15 +8,17 @@ export async function POST(req: NextRequest) {
     .insert({
       case_id: body.case_id,
       transaction_id: body.transaction_id || null,
-      proof_id: body.proof_id || null,
       slot: body.slot,
-      type: body.type || 'documento',
-      file_name: body.file_name,
+      evidence_type: body.evidence_type || 'documento',
+      title: body.title || '',
+      description: body.description || null,
       file_path: body.file_path,
       file_url: body.file_url || null,
-      mime_type: body.mime_type || null,
-      status: body.status || 'adjuntado',
-      notes: body.notes || null,
+      file_type: body.file_type || null,
+      file_size_bytes: body.file_size_bytes || null,
+      original_filename: body.original_filename || null,
+      original_source: body.original_source || null,
+      status: body.status || 'pendiente',
     })
     .select()
     .single()
