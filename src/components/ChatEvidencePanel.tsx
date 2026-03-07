@@ -112,21 +112,22 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
         </div>
       )}
 
-      {/* Audio player placeholder */}
+      {/* Audio player */}
       {message.message_type === 'audio' && (
         <div>
           <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">Reproductor</p>
-          <div className="rounded-xl border border-gray-200 bg-white p-4 flex items-center gap-3">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-              &#9654;
-            </button>
-            <div className="flex-1">
-              <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-                <div className="h-full w-0 rounded-full bg-green-500" />
-              </div>
-              <p className="mt-1 text-xs text-gray-400">{message.file_name || 'audio.opus'}</p>
+          {message.file_url ? (
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
+              <audio controls preload="metadata" className="w-full">
+                <source src={message.file_url} type="audio/ogg; codecs=opus" />
+              </audio>
+              <p className="mt-2 text-xs text-gray-400">{message.file_name || 'audio.opus'}</p>
             </div>
-          </div>
+          ) : (
+            <div className="rounded-xl border border-gray-200 bg-white p-4 flex items-center justify-center text-sm text-gray-400">
+              Sin archivo de audio disponible
+            </div>
+          )}
         </div>
       )}
 

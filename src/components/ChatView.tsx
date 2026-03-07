@@ -83,16 +83,22 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
 
         {isAudio && (
           <div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-green-700">
-                &#9654;
-              </span>
-              <div className="flex-1">
-                <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-                  <div className="h-full w-3/4 rounded-full bg-green-400" />
+            {msg.file_url ? (
+              <audio controls preload="metadata" className="w-full max-w-[240px] h-8">
+                <source src={msg.file_url} type="audio/ogg; codecs=opus" />
+              </audio>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-green-700">
+                  &#9654;
+                </span>
+                <div className="flex-1">
+                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="h-full w-3/4 rounded-full bg-green-400" />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             {msg.transcription && (
               <p className="mt-1.5 text-sm italic text-gray-500 border-t border-gray-100 pt-1.5">
                 {msg.transcription}

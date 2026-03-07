@@ -164,6 +164,7 @@ export interface ChatEvidence {
   message_type: string
   message_text: string | null
   file_name: string | null
+  file_url: string | null
   transcription: string | null
   is_key_evidence: boolean
   is_weak_point: boolean
