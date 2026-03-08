@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Case, ChatEvidence } from '@/lib/types'
 import ChatView from '@/components/ChatView'
 import ChatEvidencePanel from '@/components/ChatEvidencePanel'
@@ -15,7 +16,9 @@ interface ChatPageProps {
 const chapterIcons = ['', '\u2460', '\u2461', '\u2462', '\u2463', '\u2464']
 
 export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPageProps) {
-  const [selectedChapter, setSelectedChapter] = useState<number | null>(null)
+  const searchParams = useSearchParams()
+  const initialChapter = searchParams.get('chapter') ? parseInt(searchParams.get('chapter')!, 10) : null
+  const [selectedChapter, setSelectedChapter] = useState<number | null>(initialChapter)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [sender, setSender] = useState('')
