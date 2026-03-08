@@ -28,22 +28,16 @@ async function fetchCaseContext(caseId: string) {
   } catch {}
 
   try {
-    const keyResult = await supabaseServer
+    // Only chapters 1-5 (chapter 0 is irrelevant cell phone business)
+    const result = await supabaseServer
       .from('chat_evidence')
       .select('*')
       .eq('case_id', caseId)
-      .or('is_key_evidence.eq.true,is_weak_point.eq.true')
-      .order('chapter,sort_order')
-      .limit(500)
-    const allResult = await supabaseServer
-      .from('chat_evidence')
-      .select('*')
-      .eq('case_id', caseId)
+      .gte('chapter', 1)
+      .lte('chapter', 5)
       .order('chapter,sort_order')
       .range(0, 4999)
-    const keyIds = new Set((keyResult.data ?? []).map((r: Record<string, unknown>) => r.id))
-    const remaining = (allResult.data ?? []).filter((r: Record<string, unknown>) => !keyIds.has(r.id))
-    chatEvidence = [...(keyResult.data ?? []), ...remaining]
+    chatEvidence = result.data ?? []
   } catch {}
 
   try {
