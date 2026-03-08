@@ -34,8 +34,12 @@ function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<s
     .map((e) => `- [${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`)
     .join('\n')
 
-  const chatSummary = chatEvidence
-    .slice(0, 50)
+  // Prioritize key evidence first, then include all messages
+  const keyEvidence = chatEvidence.filter((ce) => ce.is_key_evidence || ce.is_weak_point)
+  const regularEvidence = chatEvidence.filter((ce) => !ce.is_key_evidence && !ce.is_weak_point)
+  const orderedEvidence = [...keyEvidence, ...regularEvidence]
+
+  const chatSummary = orderedEvidence
     .map((ce) => `- Cap.${ce.chapter} (${ce.sender}, ${ce.message_date}): ${ce.message_text ?? ce.file_name ?? 'archivo'}${ce.is_key_evidence ? ' [EVIDENCIA CLAVE]' : ''}${ce.is_weak_point ? ` [PUNTO DÉBIL: ${ce.weak_point_note}]` : ''}`)
     .join('\n')
 
