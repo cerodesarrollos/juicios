@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AdversarialRound, AdversarialSession } from '@/lib/types'
 import { anthropic } from '@/lib/anthropic'
 import { supabaseServer } from '@/lib/supabase-server'
+import { searchEvidence, getEmbeddedCount, formatEvidenceForPrompt } from '@/lib/evidence-search'
 
 const DEFAULT_MODEL = 'claude-opus-4-20250514'
 
@@ -12,9 +13,15 @@ const AVAILABLE_MODELS: Record<string, string> = {
   'sonnet-3.5': 'claude-3-5-sonnet-20241022',
 }
 
-async function fetchCaseContext(caseId: string) {
+async function fetchCaseData(caseId: string) {
   const caseResult = await supabaseServer.from('cases').select('*').eq('id', caseId).single()
   if (caseResult.error) throw new Error(`Error al cargar caso: ${caseResult.error.message}`)
+  return caseResult.data
+}
+
+// Fallback: fetch all evidence (used when RAG is not available)
+async function fetchCaseContext(caseId: string) {
+  const caseData = await fetchCaseData(caseId)
 
   let evidence: Record<string, unknown>[] = []
   let chatEvidence: Record<string, unknown>[] = []
@@ -28,7 +35,6 @@ async function fetchCaseContext(caseId: string) {
   } catch {}
 
   try {
-    // Only chapters 1-5 (chapter 0 is irrelevant cell phone business)
     const result = await supabaseServer
       .from('chat_evidence')
       .select('*')
@@ -55,15 +61,14 @@ async function fetchCaseContext(caseId: string) {
     transactions = r.data ?? []
   } catch {}
 
-  return { caseData: caseResult.data, evidence, chatEvidence, transcriptions, timeline, transactions }
+  return { caseData, evidence, chatEvidence, transcriptions, timeline, transactions }
 }
 
-function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<string, unknown>[], chatEvidence: Record<string, unknown>[], transcriptions: Record<string, unknown>[] = [], timeline: Record<string, unknown>[] = [], transactions: Record<string, unknown>[] = []) {
+function buildFallbackSystemPrompt(caseData: Record<string, unknown>, evidence: Record<string, unknown>[], chatEvidence: Record<string, unknown>[], transcriptions: Record<string, unknown>[] = [], timeline: Record<string, unknown>[] = [], transactions: Record<string, unknown>[] = []) {
   const evidenceSummary = evidence
     .map((e) => `- [${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`)
     .join('\n')
 
-  // Prioritize key evidence first, then include all messages
   const keyEvidence = chatEvidence.filter((ce) => ce.is_key_evidence || ce.is_weak_point)
   const regularEvidence = chatEvidence.filter((ce) => !ce.is_key_evidence && !ce.is_weak_point)
   const orderedEvidence = [...keyEvidence, ...regularEvidence]
@@ -115,13 +120,32 @@ REGLAS:
 - Responde SIEMPRE en formato JSON válido, sin markdown ni bloques de código`
 }
 
+function buildRAGSystemPrompt(caseData: Record<string, unknown>, relevantEvidence: string) {
+  return `Eres un experto analista legal argentino. Tu trabajo es generar simulaciones adversariales de alta calidad para casos legales.
+
+CASO: ${caseData.title ?? 'Sin título'}
+DESCRIPCIÓN: ${caseData.description ?? 'Sin descripción'}
+TIPO: ${caseData.case_type ?? 'No especificado'}
+ESTADO: ${caseData.status ?? 'No especificado'}
+
+EVIDENCIA RELEVANTE (encontrada por búsqueda semántica):
+${relevantEvidence}
+
+REGLAS:
+- Responde SIEMPRE en español
+- Cita artículos REALES del Código Civil y Comercial de la Nación (CCyC) y del Código Penal argentino
+- Las referencias a evidencia deben mencionar la evidencia REAL del caso listada arriba
+- La defensa debe ser genuinamente fuerte — busca debilidades REALES en la acusación
+- El puntaje de fuerza va de 1 a 10
+- Responde SIEMPRE en formato JSON válido, sin markdown ni bloques de código`
+}
+
 function parseClaudeJSON(text: string): unknown {
-  // Strip markdown code fences if present
   const cleaned = text.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '').trim()
   return JSON.parse(cleaned)
 }
 
-async function generateRound(model: string, 
+async function generateRound(model: string,
   systemPrompt: string,
   userPrompt: string,
 ): Promise<AdversarialRound> {
@@ -137,6 +161,22 @@ async function generateRound(model: string,
   return parsed
 }
 
+async function getSystemPrompt(caseId: string, searchQuery: string): Promise<{ systemPrompt: string; useRAG: boolean }> {
+  // Check if RAG is available
+  const embeddedCount = await getEmbeddedCount(caseId)
+
+  if (embeddedCount > 0) {
+    const caseData = await fetchCaseData(caseId)
+    const chunks = await searchEvidence(caseId, searchQuery, 30)
+    const relevantEvidence = formatEvidenceForPrompt(chunks)
+    return { systemPrompt: buildRAGSystemPrompt(caseData, relevantEvidence), useRAG: true }
+  }
+
+  // Fallback to full context dump
+  const { caseData, evidence, chatEvidence, transcriptions, timeline, transactions } = await fetchCaseContext(caseId)
+  return { systemPrompt: buildFallbackSystemPrompt(caseData, evidence, chatEvidence, transcriptions, timeline, transactions), useRAG: false }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { case_id, action, user_input, model: modelKey } = body
@@ -147,10 +187,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { caseData, evidence, chatEvidence, transcriptions, timeline, transactions } = await fetchCaseContext(case_id)
-    const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence, transcriptions, timeline, transactions)
+    if (action === 'check-embedded') {
+      const count = await getEmbeddedCount(case_id)
+      return NextResponse.json({ count })
+    }
 
     if (action === 'init') {
+      // For init, search broadly with case description
+      const caseData = await fetchCaseData(case_id)
+      const initQuery = `${caseData.description ?? ''} compraventa vehiculo deuda`
+      const { systemPrompt } = await getSystemPrompt(case_id, initQuery)
+
       const round = await generateRound(MODEL, systemPrompt, `Genera la Ronda 1 de la simulación adversarial para este caso. Analiza la evidencia disponible y genera argumentos de acusación y defensa.
 
 Responde en este formato JSON exacto:
@@ -192,6 +239,13 @@ Responde en este formato JSON exacto:
       const previousRounds = body.previous_rounds as AdversarialRound[] | undefined
       const roundNum = (body.current_rounds ?? 0) + 1
 
+      // Use last round's arguments as search query
+      const lastRound = previousRounds?.[previousRounds.length - 1]
+      const searchQuery = lastRound
+        ? `${lastRound.prosecution.argument.substring(0, 200)} ${lastRound.defense.counterargument.substring(0, 200)}`
+        : 'evidencia caso'
+      const { systemPrompt } = await getSystemPrompt(case_id, searchQuery)
+
       const previousContext = previousRounds
         ? `\n\nRONDAS ANTERIORES:\n${JSON.stringify(previousRounds, null, 2)}`
         : ''
@@ -225,6 +279,9 @@ Responde en este formato JSON exacto:
     if (action === 'counter') {
       const roundNum = (body.current_rounds ?? 0) + 1
       const previousRounds = body.previous_rounds as AdversarialRound[] | undefined
+
+      // Use user's input as search query
+      const { systemPrompt } = await getSystemPrompt(case_id, user_input || 'evidencia caso')
 
       const previousContext = previousRounds
         ? `\n\nRONDAS ANTERIORES:\n${JSON.stringify(previousRounds, null, 2)}`
@@ -266,13 +323,18 @@ Responde en este formato JSON exacto:
       const text = response.content[0].type === 'text' ? response.content[0].text : ''
       const round = parseClaudeJSON(text) as AdversarialRound
       round.number = roundNum
-      // Preserve the user's original argument
       round.prosecution.argument = user_input || 'Argumento manual del usuario.'
       return NextResponse.json({ round })
     }
 
     if (action === 'evaluate') {
       const rounds = body.previous_rounds as AdversarialRound[] | undefined
+
+      // Search broadly for evaluation
+      const allArguments = (rounds ?? [])
+        .map(r => `${r.prosecution.argument.substring(0, 100)} ${r.defense.counterargument.substring(0, 100)}`)
+        .join(' ')
+      const { systemPrompt } = await getSystemPrompt(case_id, allArguments || 'evaluación completa caso')
 
       const response = await anthropic.messages.create({
         model: MODEL,

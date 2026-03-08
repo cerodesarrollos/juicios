@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Case, AdversarialRound, AdversarialSession } from '@/lib/types'
 
 interface Props {
@@ -24,6 +24,9 @@ export default function AdversarialPage({ caseData }: Props) {
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
   const [evalLoading, setEvalLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState('opus-4')
+  const [embeddedCount, setEmbeddedCount] = useState<number | null>(null)
+  const [embedding, setEmbedding] = useState(false)
+  const [embedStatus, setEmbedStatus] = useState('')
 
   const models = [
     { key: 'opus-4', label: 'Claude Opus 4', desc: 'Máxima calidad' },
@@ -31,6 +34,47 @@ export default function AdversarialPage({ caseData }: Props) {
     { key: 'sonnet-3.5', label: 'Claude Sonnet 3.5', desc: 'Económico' },
     { key: 'haiku-3.5', label: 'Claude Haiku 3.5', desc: 'Ultra rápido' },
   ]
+
+  useEffect(() => {
+    checkEmbedded()
+  }, [])
+
+  async function checkEmbedded() {
+    try {
+      const res = await fetch('/api/adversarial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseData.id, action: 'check-embedded' }),
+      })
+      const data = await res.json()
+      setEmbeddedCount(data.count ?? 0)
+    } catch {
+      setEmbeddedCount(0)
+    }
+  }
+
+  async function handleEmbed() {
+    setEmbedding(true)
+    setEmbedStatus('Procesando evidencia...')
+    try {
+      const res = await fetch('/api/embed-evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseData.id }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setEmbedStatus(`Error: ${data.error}`)
+      } else {
+        setEmbedStatus(`${data.count} fragmentos procesados`)
+        setEmbeddedCount(data.count)
+      }
+    } catch (err) {
+      setEmbedStatus('Error al procesar evidencia')
+    } finally {
+      setEmbedding(false)
+    }
+  }
 
   async function apiCall(action: string, extra: Record<string, unknown> = {}) {
     const res = await fetch('/api/adversarial', {
@@ -46,7 +90,8 @@ export default function AdversarialPage({ caseData }: Props) {
     setEvaluation(null)
     try {
       const data = await apiCall('init')
-      if (data.error) { alert(`Error: ${data.error}`); setLoading(false); return }      setSession(data)
+      if (data.error) { alert(`Error: ${data.error}`); setLoading(false); return }
+      setSession(data)
     } finally {
       setLoading(false)
     }
@@ -56,7 +101,7 @@ export default function AdversarialPage({ caseData }: Props) {
     if (!session) return
     setLoading(true)
     try {
-      const data = await apiCall('auto')
+      const data = await apiCall('auto', { previous_rounds: session.rounds })
       const round: AdversarialRound = { ...data.round, number: session.rounds.length + 1 }
       setSession(prev => prev ? {
         ...prev,
@@ -77,7 +122,7 @@ export default function AdversarialPage({ caseData }: Props) {
     if (!session || !counterInput.trim()) return
     setLoading(true)
     try {
-      const data = await apiCall('counter', { user_input: counterInput })
+      const data = await apiCall('counter', { user_input: counterInput, previous_rounds: session.rounds })
       const round: AdversarialRound = { ...data.round, number: session.rounds.length + 1 }
       setSession(prev => prev ? {
         ...prev,
@@ -97,7 +142,7 @@ export default function AdversarialPage({ caseData }: Props) {
     if (!session) return
     setEvalLoading(true)
     try {
-      const data = await apiCall('evaluate')
+      const data = await apiCall('evaluate', { previous_rounds: session.rounds })
       setEvaluation(data.evaluation)
     } finally {
       setEvalLoading(false)
@@ -129,6 +174,11 @@ export default function AdversarialPage({ caseData }: Props) {
                   <option key={m.key} value={m.key}>{m.label} — {m.desc}</option>
                 ))}
               </select>
+              {embeddedCount !== null && (
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${embeddedCount > 0 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                  {embeddedCount > 0 ? `RAG: ${embeddedCount} chunks` : 'Sin RAG'}
+                </span>
+              )}
             </div>
           </div>
           {session && (
@@ -166,6 +216,44 @@ export default function AdversarialPage({ caseData }: Props) {
                 Generara argumentos, contraargumentos y evaluara la fortaleza de cada posicion
                 basandose en la evidencia disponible y articulos legales aplicables.
               </p>
+
+              {/* Embed evidence section */}
+              {embeddedCount !== null && embeddedCount === 0 && (
+                <div className="mt-4 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+                  <p className="text-sm text-yellow-800 mb-3">
+                    La evidencia no esta preparada para busqueda semantica. Preparala para obtener mejores resultados.
+                  </p>
+                  <button
+                    onClick={handleEmbed}
+                    disabled={embedding}
+                    className="rounded-xl bg-yellow-600 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-500 disabled:opacity-50"
+                  >
+                    {embedding ? 'Procesando...' : 'Preparar Evidencia'}
+                  </button>
+                  {embedStatus && (
+                    <p className="mt-2 text-xs text-yellow-700">{embedStatus}</p>
+                  )}
+                </div>
+              )}
+
+              {embeddedCount !== null && embeddedCount > 0 && (
+                <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3">
+                  <p className="text-sm text-green-700">
+                    Evidencia preparada: {embeddedCount} fragmentos indexados para busqueda semantica.
+                  </p>
+                  <button
+                    onClick={handleEmbed}
+                    disabled={embedding}
+                    className="mt-2 text-xs text-green-600 underline hover:text-green-800 disabled:opacity-50"
+                  >
+                    {embedding ? 'Re-procesando...' : 'Re-procesar evidencia'}
+                  </button>
+                  {embedStatus && (
+                    <p className="mt-1 text-xs text-green-600">{embedStatus}</p>
+                  )}
+                </div>
+              )}
+
               <button
                 onClick={handleInit}
                 disabled={loading}
