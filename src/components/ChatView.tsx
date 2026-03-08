@@ -232,7 +232,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         </div>
       </div>
       {/* Action buttons — appear on hover */}
-      <div className={`hidden md:flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isMatias ? 'order-first mr-1.5' : 'ml-1.5'}`}>
+      <div className={`flex flex-col gap-1 transition-opacity ${isMatias ? 'order-first mr-1.5' : 'ml-1.5'}`}>
         {/* Send to evidence panel */}
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}
