@@ -15,7 +15,6 @@ function fmt(s: number) {
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
 
-// Generate pseudo-random waveform bars from src hash
 function generateBars(src: string, count: number): number[] {
   let hash = 0
   for (let i = 0; i < src.length; i++) {
@@ -25,7 +24,7 @@ function generateBars(src: string, count: number): number[] {
   for (let i = 0; i < count; i++) {
     hash = ((hash << 5) - hash + i * 7) | 0
     const val = Math.abs(hash % 100)
-    bars.push(0.15 + (val / 100) * 0.85) // min 15%, max 100%
+    bars.push(0.2 + (val / 100) * 0.8)
   }
   return bars
 }
@@ -36,10 +35,10 @@ export default function InlineAudioPlayer({ src, transcription, isOutgoing = fal
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [speed, setSpeed] = useState(1)
-  const [showTranscription, setShowTranscription] = useState(false)
 
   const speeds = [1, 1.5, 2, 0.5]
-  const BAR_COUNT = 28
+  const BAR_COUNT = 20
+  const BAR_HEIGHT = 18
   const bars = useMemo(() => generateBars(src, BAR_COUNT), [src])
 
   useEffect(() => {
@@ -75,55 +74,48 @@ export default function InlineAudioPlayer({ src, transcription, isOutgoing = fal
     setSpeed(next)
   }
 
-  function seekFromBar(barIndex: number) {
-    const audio = audioRef.current
-    if (!audio || !duration) return
-    const time = (barIndex / BAR_COUNT) * duration
-    audio.currentTime = time
-    setCurrentTime(time)
-  }
-
   const progress = duration > 0 ? currentTime / duration : 0
-
-  const accentColor = isOutgoing ? 'rgb(21 128 61)' : 'rgb(59 130 246)' // green-700 / blue-500
-  const dimColor = isOutgoing ? 'rgb(187 247 208)' : 'rgb(191 219 254)' // green-200 / blue-200
-  const bgHover = isOutgoing ? 'hover:bg-green-200/50' : 'hover:bg-blue-200/50'
+  const accentColor = isOutgoing ? 'rgb(21 128 61)' : 'rgb(59 130 246)'
+  const dimColor = isOutgoing ? 'rgb(187 247 208)' : 'rgb(191 219 254)'
 
   return (
-    <div className="min-w-[220px] max-w-[280px]">
+    <div className="min-w-[200px] max-w-[260px]">
       <audio ref={audioRef} src={src} preload="metadata" />
 
-      {/* Main player row */}
-      <div className="flex items-center gap-2">
+      {/* Player row: play button + waveform vertically centered */}
+      <div className="flex items-center gap-2.5">
         {/* Play button */}
         <button
           onClick={togglePlay}
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition-colors"
           style={{ backgroundColor: accentColor }}
         >
           {playing ? (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="white">
               <rect x="2" y="1" width="3.5" height="12" rx="1" />
               <rect x="8.5" y="1" width="3.5" height="12" rx="1" />
             </svg>
           ) : (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="white">
               <path d="M3 1.5v11l9-5.5z" />
             </svg>
           )}
         </button>
 
-        {/* Waveform + time */}
+        {/* Waveform + time row */}
         <div className="flex-1 min-w-0">
-          {/* Waveform bars */}
+          {/* Waveform bars — centered to match play button center */}
           <div
-            className="flex items-end gap-[2px] h-[28px] cursor-pointer"
+            className="flex items-center gap-[2px] cursor-pointer"
+            style={{ height: `${BAR_HEIGHT}px` }}
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
-              const x = e.clientX - rect.left
-              const ratio = x / rect.width
-              const idx = Math.floor(ratio * BAR_COUNT)
-              seekFromBar(Math.max(0, Math.min(BAR_COUNT - 1, idx)))
+              const ratio = (e.clientX - rect.left) / rect.width
+              const audio = audioRef.current
+              if (audio && duration) {
+                audio.currentTime = ratio * duration
+                setCurrentTime(ratio * duration)
+              }
             }}
           >
             {bars.map((h, i) => {
@@ -131,11 +123,12 @@ export default function InlineAudioPlayer({ src, transcription, isOutgoing = fal
               return (
                 <div
                   key={i}
-                  className="flex-1 rounded-full transition-colors duration-100"
+                  className="flex-1 rounded-full"
                   style={{
-                    height: `${h * 28}px`,
+                    height: `${Math.round(h * BAR_HEIGHT)}px`,
                     minWidth: '2px',
                     backgroundColor: played ? accentColor : dimColor,
+                    transition: 'background-color 0.15s',
                   }}
                 />
               )
@@ -149,7 +142,7 @@ export default function InlineAudioPlayer({ src, transcription, isOutgoing = fal
             </span>
             <button
               onClick={cycleSpeed}
-              className={`rounded px-1.5 py-0.5 text-[10px] font-bold transition-colors ${bgHover}`}
+              className="rounded px-1 py-0.5 text-[10px] font-bold"
               style={{ color: accentColor }}
             >
               {speed}×
@@ -158,31 +151,11 @@ export default function InlineAudioPlayer({ src, transcription, isOutgoing = fal
         </div>
       </div>
 
-      {/* Transcription toggle */}
+      {/* Transcription — always visible */}
       {transcription && (
-        <div className="mt-1.5">
-          <button
-            onClick={() => setShowTranscription(!showTranscription)}
-            className="flex items-center gap-1 text-[10px] font-medium transition-colors"
-            style={{ color: accentColor }}
-          >
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 10 10"
-              fill="currentColor"
-              className={`transition-transform ${showTranscription ? 'rotate-90' : ''}`}
-            >
-              <path d="M3 1l5 4-5 4z" />
-            </svg>
-            Transcripción
-          </button>
-          {showTranscription && (
-            <p className="mt-1 text-xs leading-relaxed opacity-75 whitespace-pre-wrap">
-              {transcription}
-            </p>
-          )}
-        </div>
+        <p className="mt-1.5 text-xs leading-relaxed opacity-70 whitespace-pre-wrap">
+          {transcription}
+        </p>
       )}
     </div>
   )
