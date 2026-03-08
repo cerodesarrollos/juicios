@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { caseData, evidence, chatEvidence } = await fetchCaseContext(case_id)
+    const { caseData, evidence, chatEvidence, transcriptions, timeline, transactions } = await fetchCaseContext(case_id)
     const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence, transcriptions, timeline, transactions)
 
     if (action === 'init') {
