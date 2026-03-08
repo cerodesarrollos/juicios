@@ -37,8 +37,8 @@ export default function AdversarialPage({ caseData }: Props) {
     setLoading(true)
     setEvaluation(null)
     try {
-      const data: AdversarialSession = await apiCall('init')
-      setSession(data)
+      const data = await apiCall('init')
+      if (data.error) { alert(`Error: ${data.error}`); setLoading(false); return }      setSession(data)
     } finally {
       setLoading(false)
     }

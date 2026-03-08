@@ -6,18 +6,26 @@ import { supabaseServer } from '@/lib/supabase-server'
 const MODEL = 'claude-opus-4-0-20250514'
 
 async function fetchCaseContext(caseId: string) {
-  const [caseResult, evidenceResult, chatEvidenceResult] = await Promise.all([
-    supabaseServer.from('cases').select('*').eq('id', caseId).single(),
-    supabaseServer.from('evidence').select('*').eq('case_id', caseId),
-    supabaseServer.from('chat_evidence').select('*').eq('case_id', caseId).order('sort_order'),
-  ])
+  const caseResult = await supabaseServer.from('cases').select('*').eq('id', caseId).single()
+  if (caseResult.error) throw new Error(\`Error al cargar caso: \${caseResult.error.message}\`)
 
-  if (caseResult.error) throw new Error(`Error al cargar caso: ${caseResult.error.message}`)
+  let evidence: Record<string, unknown>[] = []
+  let chatEvidence: Record<string, unknown>[] = []
+
+  try {
+    const evidenceResult = await supabaseServer.from('evidence').select('*').eq('case_id', caseId)
+    evidence = evidenceResult.data ?? []
+  } catch { /* table may not exist */ }
+
+  try {
+    const chatEvidenceResult = await supabaseServer.from('chat_evidence').select('*').eq('case_id', caseId).order('sort_order')
+    chatEvidence = chatEvidenceResult.data ?? []
+  } catch { /* table may not exist */ }
 
   return {
     caseData: caseResult.data,
-    evidence: evidenceResult.data ?? [],
-    chatEvidence: chatEvidenceResult.data ?? [],
+    evidence,
+    chatEvidence,
   }
 }
 
