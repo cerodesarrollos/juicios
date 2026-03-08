@@ -96,7 +96,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
 
       <div
         onClick={onSelect}
-        className={`relative max-w-[75%] rounded-xl px-3 py-2 cursor-pointer transition-shadow ${borderHighlight} ${
+        className={`relative max-w-[85%] md:max-w-[75%] rounded-xl px-3 py-2 cursor-pointer transition-shadow ${borderHighlight} ${
           isMatias
             ? 'bg-green-100 text-gray-900'
             : 'bg-white border border-gray-200 text-gray-900'
@@ -232,7 +232,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         </div>
       </div>
       {/* Action buttons — appear on hover */}
-      <div className={`flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isMatias ? 'order-first mr-1.5' : 'ml-1.5'}`}>
+      <div className={`hidden md:flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isMatias ? 'order-first mr-1.5' : 'ml-1.5'}`}>
         {/* Send to evidence panel */}
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}

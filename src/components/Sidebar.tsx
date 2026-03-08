@@ -14,6 +14,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
   const pathname = usePathname()
   const [caseName, setCaseName] = useState<string | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
+  const [docsOpen, setDocsOpen] = useState(false)
   const [chapters, setChapters] = useState<Chapter[]>([])
 
   const caseMatch = pathname.match(/^\/case\/([^/]+)/)
@@ -134,6 +135,46 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                         <span className="ml-1 flex-shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-400">
                           {ch.count}
                         </span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Doc Respaldatoria */}
+              <div>
+                <button
+                  onClick={() => setDocsOpen(!docsOpen)}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                >
+                  <span>📋 Doc. Respaldatoria</span>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="currentColor"
+                    className={`transition-transform duration-200 ${docsOpen ? 'rotate-90' : ''}`}
+                  >
+                    <path d="M4 2l5 4-5 4z" />
+                  </svg>
+                </button>
+
+                {docsOpen && (
+                  <div className="ml-3 mt-0.5 space-y-0.5 border-l-2 border-gray-100 pl-2">
+                    {[
+                      { label: 'Informes DNRPA', slug: 'informes-dnrpa' },
+                      { label: 'Informe BCRA', slug: 'informe-bcra' },
+                      { label: 'Informe Veraz', slug: 'informe-veraz' },
+                      { label: 'Historial Multas', slug: 'historial-multas' },
+                      { label: 'TelePASE', slug: 'telepase' },
+                      { label: 'Certificación Notarial', slug: 'certificacion-notarial' },
+                    ].map(doc => (
+                      <Link
+                        key={doc.slug}
+                        href={`/case/${caseSlug}/docs?doc=${doc.slug}`}
+                        className="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                      >
+                        <span>{doc.label}</span>
                       </Link>
                     ))}
                   </div>
