@@ -7,7 +7,7 @@ const MODEL = 'claude-opus-4-0-20250514'
 
 async function fetchCaseContext(caseId: string) {
   const caseResult = await supabaseServer.from('cases').select('*').eq('id', caseId).single()
-  if (caseResult.error) throw new Error(\`Error al cargar caso: \${caseResult.error.message}\`)
+  if (caseResult.error) throw new Error(`Error al cargar caso: ${caseResult.error.message}`)
 
   let evidence: Record<string, unknown>[] = []
   let chatEvidence: Record<string, unknown>[] = []
