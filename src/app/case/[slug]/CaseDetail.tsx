@@ -155,8 +155,7 @@ export default function CaseDetail({ caseData, transactions, evidence, parties, 
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <Link href="/" className="text-sm font-medium text-green-800 hover:underline">&larr; Todos los Casos</Link>
-          <h1 className="mt-2 text-2xl font-bold text-gray-900">{caseData.title}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{caseData.title}</h1>
           <p className="mt-1 text-sm text-gray-500">{caseData.plaintiff_name} vs {caseData.defendant_name}</p>
         </div>
         <div className="flex items-center gap-2">

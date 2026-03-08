@@ -76,14 +76,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <Link
-            href={`/case/${caseData.slug}`}
-            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-          >
-            &#8592; {caseData.title}
-          </Link>
-          <span className="text-gray-300">|</span>
-          <h1 className="text-sm font-semibold text-gray-800">Chat Completo</h1>
+          <h1 className="text-sm font-semibold text-gray-800">💬 Chat</h1>
           {selectedChapter !== null && (
             <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
               Cap. {selectedChapter}
