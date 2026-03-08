@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChatEvidence } from '@/lib/types'
+import InlineAudioPlayer from './InlinAudioPlayer'
 
 interface ChatViewProps {
   caseId: string
@@ -84,9 +85,11 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
         {isAudio && (
           <div>
             {msg.file_url ? (
-              <audio controls preload="metadata" className="w-full max-w-[240px] h-8">
-                <source src={msg.file_url} type="audio/ogg; codecs=opus" />
-              </audio>
+              <InlineAudioPlayer
+                src={msg.file_url}
+                transcription={msg.transcription}
+                isOutgoing={isMatias}
+              />
             ) : (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-green-700">
@@ -98,11 +101,6 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
                   </div>
                 </div>
               </div>
-            )}
-            {msg.transcription && (
-              <p className="mt-1.5 text-sm italic text-gray-500 border-t border-gray-100 pt-1.5">
-                {msg.transcription}
-              </p>
             )}
           </div>
         )}
