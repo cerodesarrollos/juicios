@@ -94,6 +94,14 @@ PARTES DEL CASO:
 - DEMANDANTE/ACUSACIÓN: ${caseData.plaintiff_name} (quien inicia la demanda)
 - DEMANDADO/DEFENSA: ${caseData.defendant_name} (quien debe responder)
 
+IDENTIFICACIÓN DE SENDERS EN LOS CHATS:
+- El sender "Matias" o "Matías" = Matias Toro = DEMANDANTE
+- El sender "Franco" = Franco Chaves = DEMANDADO  
+- "Toro" es el APELLIDO del demandante (Matias Toro), pero TAMBIÉN es un apodo que ambos usan entre sí
+- Para saber quién habla, mirá SIEMPRE el campo sender al inicio del mensaje, NO el contenido
+- Ejemplo: "Matias (15/03/2024): che toro..." → habla MATIAS (demandante) dirigiéndose a Chaves
+- Ejemplo: "Franco (15/03/2024): toro dame..." → habla FRANCO (demandado) dirigiéndose a Matias
+
 REGLA CRÍTICA DE ATRIBUCIÓN:
 - Cada mensaje tiene un EMISOR (sender). Prestá MÁXIMA atención a QUIÉN dice cada cosa.
 - Si ${caseData.plaintiff_name} dice "no me das información" → es el DEMANDANTE reclamando al demandado
@@ -349,7 +357,59 @@ Responde en este formato JSON exacto:
       return NextResponse.json({ round })
     }
 
-    if (action === 'evaluate') {
+    
+    if (action === 'build') {
+      // User writes a rough argument idea, AI builds a proper prosecution argument with evidence
+      const searchResults = await searchEvidence(case_id, user_input || '', 40)
+      const evidenceContext = formatEvidenceForPrompt(searchResults)
+
+      const response = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 4096,
+        system: ragSystemPrompt,
+        messages: [{
+          role: 'user',
+          content: `El abogado del DEMANDANTE quiere construir el siguiente argumento:
+
+"${user_input}"
+
+EVIDENCIA RELEVANTE ENCONTRADA:
+${evidenceContext}
+
+Tu trabajo: Tomá esa idea y convertila en un ARGUMENTO LEGAL SÓLIDO para la acusación.
+- Mejorá la redacción legal
+- Citá evidencia ESPECÍFICA del caso (con sender correcto, fecha, texto exacto)
+- Citá artículos legales argentinos aplicables
+- Hacé que sea contundente e irrefutable
+- Después generá el MEJOR contraargumento posible de la defensa
+
+Responde en JSON:
+{
+  "number": 0,
+  "prosecution": {
+    "argument": "argumento legal mejorado y fundamentado",
+    "evidence_refs": ["evidencia citada"],
+    "legal_articles": ["Art. X CCyC - descripción"],
+    "strength": 8
+  },
+  "defense": {
+    "counterargument": "mejor contraargumento posible",
+    "evidence_refs": ["evidencia citada"],
+    "legal_articles": ["Art. X CCyC - descripción"],
+    "strength": 6
+  },
+  "round_winner": "prosecution"
+}`
+        }],
+      })
+
+      const text = response.content[0].type === 'text' ? response.content[0].text : ''
+      const round = parseClaudeJSON(text) as AdversarialRound
+      round.number = (body.current_rounds ?? 0) + 1
+      return NextResponse.json({ round })
+    }
+
+if (action === 'evaluate') {
       const rounds = body.previous_rounds as AdversarialRound[] | undefined
 
       // Search broadly for evaluation

@@ -414,7 +414,7 @@ export default function AdversarialPage({ caseData }: Props) {
                 value={counterInput}
                 onChange={e => setCounterInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleCounter()}
-                placeholder="Escribir contraargumento manual..."
+                placeholder="Escribí tu argumento y la IA lo mejora con evidencia y citas legales..."
                 className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none placeholder:text-gray-400"
               />
               <button
