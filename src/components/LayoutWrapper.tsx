@@ -6,7 +6,6 @@ import Sidebar from './Sidebar'
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isShared = pathname.startsWith('/shared')
-  const isChat = pathname.includes('/chat')
 
   if (isShared) {
     return (
@@ -19,25 +18,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }
 
   return (
-    <>
-      <Sidebar />
-      <main className="ml-0 min-h-screen bg-gray-100 md:ml-56">
-        {isChat ? (
-          // Chat page: full bleed, no card wrapper (has its own WhatsApp-style bg)
-          <div className="p-4 md:p-6">
-            <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl shadow-sm ring-1 ring-gray-200">
-              {children}
-            </div>
-          </div>
-        ) : (
-          // All other pages: wrapped in a white card
-          <div className="mx-auto max-w-7xl p-4 md:p-6">
-            <div className="overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-              {children}
-            </div>
-          </div>
-        )}
-      </main>
-    </>
+    <div className="min-h-screen bg-gray-200 p-3 md:p-6">
+      <div className="mx-auto max-w-[1400px] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-gray-200" style={{ minHeight: 'calc(100vh - 48px)' }}>
+        <div className="flex" style={{ minHeight: 'calc(100vh - 48px)' }}>
+          <Sidebar />
+          <main className="flex-1 overflow-hidden">
+            {children}
+          </main>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -56,7 +56,7 @@ export default function Sidebar() {
   ]
 
   return (
-    <aside className="no-print fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-gray-200 bg-white">
+    <aside className="no-print flex w-56 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl">&#9878;</span>
