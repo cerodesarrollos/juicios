@@ -206,6 +206,31 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
         </div>
       )}
 
+      {/* Document preview */}
+      {message.message_type === 'document' && message.file_url && (
+        <div>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">Documento</p>
+          <div className="overflow-hidden rounded-xl border border-gray-200">
+            <iframe
+              src={message.file_url}
+              className="w-full h-[500px]"
+              title={message.file_name || 'Documento'}
+            />
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs text-gray-400">{message.file_name}</p>
+            <a
+              href={message.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-green-700 hover:underline"
+            >
+              Abrir en nueva pestaña ↗
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Weak point note */}
       {message.is_weak_point && message.weak_point_note && (
         <div>

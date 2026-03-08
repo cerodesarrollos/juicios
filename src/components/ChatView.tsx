@@ -169,10 +169,20 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         )}
 
         {isDocument && (
-          <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
-            <span className="text-2xl">&#128196;</span>
-            <span>{msg.file_name || 'Documento'}</span>
-          </div>
+          msg.file_url ? (
+            <div
+              className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-blue-600 cursor-pointer hover:bg-blue-50 transition-colors"
+              onClick={(e) => { e.stopPropagation(); onSelect(); }}
+            >
+              <span className="text-2xl">📄</span>
+              <span className="underline truncate">{msg.file_name || 'Documento'}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+              <span className="text-2xl">📄</span>
+              <span>{msg.file_name || 'Documento'}</span>
+            </div>
+          )
         )}
 
         {isSticker && (
