@@ -62,10 +62,22 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
   return (
     <div
       id={`msg-${msg.evidence_id}`}
-      className={`flex ${isMatias ? 'justify-end' : 'justify-start'} mb-1 group`}
-      onClick={onSelect}
+      className={`flex items-center ${isMatias ? 'justify-end' : 'justify-start'} mb-1 group`}
     >
+      {/* Arrow button — left side for Matias (outgoing) */}
+      {isMatias && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onSelect(); }}
+          className="mr-1.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/80 text-gray-400 opacity-0 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-green-50 hover:text-green-600 hover:ring-green-300 group-hover:opacity-100"
+          title="Ver en panel de evidencia"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M3 7h8M8 4l3 3-3 3" />
+          </svg>
+        </button>
+      )}
       <div
+        onClick={onSelect}
         className={`relative max-w-[75%] rounded-xl px-3 py-2 cursor-pointer transition-shadow ${borderHighlight} ${
           isMatias
             ? 'bg-green-100 text-gray-900'
@@ -165,6 +177,18 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
           <span className="text-[10px] text-gray-400">{formatTime(msg.message_date)}</span>
         </div>
       </div>
+      {/* Arrow button — right side for incoming (Toro) */}
+      {!isMatias && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onSelect(); }}
+          className="ml-1.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/80 text-gray-400 opacity-0 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-green-50 hover:text-green-600 hover:ring-green-300 group-hover:opacity-100"
+          title="Ver en panel de evidencia"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M3 7h8M8 4l3 3-3 3" />
+          </svg>
+        </button>
+      )}
     </div>
   )
 }
