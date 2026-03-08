@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChatEvidence } from '@/lib/types'
 import InlineAudioPlayer from './InlinAudioPlayer'
 
@@ -44,6 +45,16 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
   onUpdate?: (id: string, updates: Partial<ChatEvidence>) => void
 }) {
   const [showChapterMenu, setShowChapterMenu] = useState(false)
+  const chapterBtnRef = useRef<HTMLButtonElement>(null)
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null)
+
+  useEffect(() => {
+    if (showChapterMenu && chapterBtnRef.current) {
+      const rect = chapterBtnRef.current.getBoundingClientRect()
+      setMenuPos({ top: rect.bottom + 4, left: rect.left })
+    }
+    if (!showChapterMenu) setMenuPos(null)
+  }, [showChapterMenu])
   const isDeleted = msg.message_type === 'deleted'
   const isSystem = msg.message_type === 'system'
   const isAudio = msg.message_type === 'audio'
@@ -217,8 +228,9 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
             </button>
 
             {/* Move to chapter */}
-            <div className="relative">
+            <div>
               <button
+                ref={chapterBtnRef}
                 onClick={(e) => { e.stopPropagation(); setShowChapterMenu(!showChapterMenu) }}
                 className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/90 text-gray-400 shadow-sm ring-1 ring-gray-200 hover:bg-blue-50 hover:text-blue-500 hover:ring-blue-300"
                 title="Mover a capítulo"
@@ -227,30 +239,37 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
                   <path d="M2 3h4l1.5 1.5H12v7H2z" />
                 </svg>
               </button>
-              {showChapterMenu && chapters && (
-                <div className="absolute top-8 left-0 z-50 w-48 rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200">
-                  {chapters.map(ch => (
-                    <button
-                      key={ch.chapter}
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        await fetch('/api/chat-evidence/update', {
-                          method: 'PATCH',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ id: msg.id, chapter: ch.chapter, chapter_name: ch.name }),
-                        })
-                        onUpdate?.(msg.id, { chapter: ch.chapter, chapter_name: ch.name })
-                        setShowChapterMenu(false)
-                      }}
-                      className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors hover:bg-gray-50 ${
-                        msg.chapter === ch.chapter ? 'font-semibold text-green-700 bg-green-50' : 'text-gray-700'
-                      }`}
-                    >
-                      <span className="w-4 text-center">{ch.chapter}</span>
-                      <span className="truncate">{ch.name}</span>
-                    </button>
-                  ))}
-                </div>
+              {showChapterMenu && menuPos && chapters && chapters.length > 0 && createPortal(
+                <>
+                  <div className="fixed inset-0 z-[9998]" onClick={() => setShowChapterMenu(false)} />
+                  <div
+                    className="fixed z-[9999] w-48 rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200"
+                    style={{ top: menuPos.top, left: menuPos.left }}
+                  >
+                    {chapters.map(ch => (
+                      <button
+                        key={ch.chapter}
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          await fetch('/api/chat-evidence/update', {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: msg.id, chapter: ch.chapter, chapter_name: ch.name }),
+                          })
+                          onUpdate?.(msg.id, { chapter: ch.chapter, chapter_name: ch.name })
+                          setShowChapterMenu(false)
+                        }}
+                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors hover:bg-gray-50 ${
+                          msg.chapter === ch.chapter ? 'font-semibold text-green-700 bg-green-50' : 'text-gray-700'
+                        }`}
+                      >
+                        <span className="w-4 text-center">{ch.chapter}</span>
+                        <span className="truncate">{ch.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>,
+                document.body
               )}
             </div>
           </>
