@@ -227,6 +227,11 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               {msg.is_key_evidence ? 'Clave' : 'Debil'}
             </span>
           )}
+          {msg.chapter > 0 && (
+            <span className="inline-block rounded bg-blue-100 px-1 py-0.5 text-[10px] font-medium text-blue-600">
+              Cap.{msg.chapter}
+            </span>
+          )}
           <span className="rounded bg-green-800 px-1.5 py-0.5 font-mono text-[10px] text-white opacity-70 group-hover:opacity-100">
             {msg.evidence_id}
           </span>

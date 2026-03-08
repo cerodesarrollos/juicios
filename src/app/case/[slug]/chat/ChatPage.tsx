@@ -79,6 +79,8 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
     setMessageType('')
     setKeyEvidence(false)
     setWeakPoints(false)
+    setDateFrom('')
+    setDateTo('')
   }
 
   const hasFilters = selectedChapter !== null || search || sender || messageType || keyEvidence || weakPoints || dateFrom || dateTo
