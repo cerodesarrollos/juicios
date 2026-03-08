@@ -90,6 +90,19 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                 </Link>
               ))}
 
+              {/* Simulacion Adversarial */}
+              <Link
+                href={`/case/${caseSlug}/adversarial`}
+                onClick={onNavigate}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname.includes('/adversarial')
+                    ? 'bg-green-50 text-green-800 font-semibold'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <span>Sim. Adversarial</span>
+              </Link>
+
               {/* Chat with expandable chapters */}
               <div>
                 <button

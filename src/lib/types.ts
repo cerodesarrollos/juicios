@@ -153,6 +153,36 @@ export type TransactionWithParties = Transaction & {
   to_party: { name: string } | null
 }
 
+export interface AdversarialRound {
+  number: number
+  prosecution: {
+    argument: string
+    evidence_refs: string[]
+    legal_articles: string[]
+    strength: number
+  }
+  defense: {
+    counterargument: string
+    evidence_refs: string[]
+    legal_articles: string[]
+    strength: number
+  }
+  round_winner: 'prosecution' | 'defense' | 'draw'
+}
+
+export interface AdversarialSession {
+  id: string
+  case_id: string
+  rounds: AdversarialRound[]
+  overall_score: {
+    prosecution: number
+    defense: number
+    unresolved_points: number
+    resolved_points: number
+  }
+  status: 'active' | 'completed'
+}
+
 export interface ChatEvidence {
   id: string
   case_id: string
