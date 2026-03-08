@@ -3,7 +3,7 @@ import { AdversarialRound, AdversarialSession } from '@/lib/types'
 import { anthropic } from '@/lib/anthropic'
 import { supabaseServer } from '@/lib/supabase-server'
 
-const MODEL = 'claude-opus-4-0-20250514'
+const MODEL = 'claude-sonnet-4-20250514'
 
 async function fetchCaseContext(caseId: string) {
   const caseResult = await supabaseServer.from('cases').select('*').eq('id', caseId).single()
