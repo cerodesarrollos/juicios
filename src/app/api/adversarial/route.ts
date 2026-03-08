@@ -95,8 +95,8 @@ PARTES DEL CASO:
 - DEMANDADO/DEFENSA: ${caseData.defendant_name} (quien debe responder)
 
 IDENTIFICACIÓN DE SENDERS EN LOS CHATS:
-- El sender "Matias" o "Matías" = Matias Toro = DEMANDANTE
-- El sender "Franco" = Franco Chaves = DEMANDADO  
+- El sender "Matias" = Matias Toro = DEMANDANTE
+- El sender "Toro" = Franco Chaves = DEMANDADO (en los chats aparece como "Toro")  
 - "Toro" es el APELLIDO del demandante (Matias Toro), pero TAMBIÉN es un apodo que ambos usan entre sí
 - Para saber quién habla, mirá SIEMPRE el campo sender al inicio del mensaje, NO el contenido
 - Ejemplo: "Matias (15/03/2024): che toro..." → habla MATIAS (demandante) dirigiéndose a Chaves
