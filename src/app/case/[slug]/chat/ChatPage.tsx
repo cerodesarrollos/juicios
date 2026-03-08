@@ -195,6 +195,8 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
             selectedId={selectedMessage?.id ?? null}
             onSelect={setSelectedMessage}
             jumpToId={jumpToId}
+            showActions={selectedChapter === null && !weakPoints}
+            chapters={chapters.map(c => ({ chapter: c.chapter, name: c.name }))}
           />
         </div>
 

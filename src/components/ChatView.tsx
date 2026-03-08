@@ -4,6 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChatEvidence } from '@/lib/types'
 import InlineAudioPlayer from './InlinAudioPlayer'
 
+interface ChapterInfo {
+  chapter: number
+  name: string
+}
+
 interface ChatViewProps {
   caseId: string
   chapter: number | null
@@ -15,6 +20,8 @@ interface ChatViewProps {
   selectedId: string | null
   onSelect: (msg: ChatEvidence) => void
   jumpToId: string
+  showActions?: boolean
+  chapters?: ChapterInfo[]
 }
 
 function formatDate(dateStr: string) {
@@ -27,12 +34,16 @@ function formatTime(dateStr: string) {
   return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
 }
 
-function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
+function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapters, onUpdate }: {
   msg: ChatEvidence
   isMatias: boolean
   isSelected: boolean
   onSelect: () => void
+  showActions?: boolean
+  chapters?: ChapterInfo[]
+  onUpdate?: (id: string, updates: Partial<ChatEvidence>) => void
 }) {
+  const [showChapterMenu, setShowChapterMenu] = useState(false)
   const isDeleted = msg.message_type === 'deleted'
   const isSystem = msg.message_type === 'system'
   const isAudio = msg.message_type === 'audio'
@@ -64,18 +75,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
       id={`msg-${msg.evidence_id}`}
       className={`flex items-center ${isMatias ? 'justify-end' : 'justify-start'} mb-1 group`}
     >
-      {/* Arrow button — left side for Matias (outgoing) */}
-      {isMatias && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onSelect(); }}
-          className="mr-1.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/80 text-gray-400 opacity-0 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-green-50 hover:text-green-600 hover:ring-green-300 group-hover:opacity-100"
-          title="Ver en panel de evidencia"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M3 7h8M8 4l3 3-3 3" />
-          </svg>
-        </button>
-      )}
+
       <div
         onClick={onSelect}
         className={`relative max-w-[75%] rounded-xl px-3 py-2 cursor-pointer transition-shadow ${borderHighlight} ${
@@ -177,25 +177,92 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect }: {
           <span className="text-[10px] text-gray-400">{formatTime(msg.message_date)}</span>
         </div>
       </div>
-      {/* Arrow button — right side for incoming (Toro) */}
-      {!isMatias && (
+      {/* Action buttons — appear on hover */}
+      <div className={`flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity ${isMatias ? 'order-first mr-1.5' : 'ml-1.5'}`}>
+        {/* Send to evidence panel */}
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}
-          className="ml-1.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/80 text-gray-400 opacity-0 shadow-sm ring-1 ring-gray-200 transition-all hover:bg-green-50 hover:text-green-600 hover:ring-green-300 group-hover:opacity-100"
+          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/90 text-gray-400 shadow-sm ring-1 ring-gray-200 hover:bg-green-50 hover:text-green-600 hover:ring-green-300"
           title="Ver en panel de evidencia"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M3 7h8M8 4l3 3-3 3" />
           </svg>
         </button>
-      )}
+
+        {showActions && (
+          <>
+            {/* Toggle relevant */}
+            <button
+              onClick={async (e) => {
+                e.stopPropagation()
+                const newVal = !msg.is_key_evidence
+                await fetch('/api/chat-evidence/update', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: msg.id, is_key_evidence: newVal }),
+                })
+                onUpdate?.(msg.id, { is_key_evidence: newVal })
+              }}
+              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full shadow-sm ring-1 transition-colors ${
+                msg.is_key_evidence
+                  ? 'bg-yellow-100 text-yellow-600 ring-yellow-300'
+                  : 'bg-white/90 text-gray-400 ring-gray-200 hover:bg-yellow-50 hover:text-yellow-500 hover:ring-yellow-300'
+              }`}
+              title={msg.is_key_evidence ? 'Quitar relevante' : 'Marcar como relevante'}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill={msg.is_key_evidence ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5">
+                <path d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.4 3.3 12.3l.7-4.1-3-2.9 4.2-.7z" />
+              </svg>
+            </button>
+
+            {/* Move to chapter */}
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowChapterMenu(!showChapterMenu) }}
+                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/90 text-gray-400 shadow-sm ring-1 ring-gray-200 hover:bg-blue-50 hover:text-blue-500 hover:ring-blue-300"
+                title="Mover a capítulo"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M2 3h4l1.5 1.5H12v7H2z" />
+                </svg>
+              </button>
+              {showChapterMenu && chapters && (
+                <div className="absolute top-8 left-0 z-50 w-48 rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200">
+                  {chapters.map(ch => (
+                    <button
+                      key={ch.chapter}
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        await fetch('/api/chat-evidence/update', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ id: msg.id, chapter: ch.chapter, chapter_name: ch.name }),
+                        })
+                        onUpdate?.(msg.id, { chapter: ch.chapter, chapter_name: ch.name })
+                        setShowChapterMenu(false)
+                      }}
+                      className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors hover:bg-gray-50 ${
+                        msg.chapter === ch.chapter ? 'font-semibold text-green-700 bg-green-50' : 'text-gray-700'
+                      }`}
+                    >
+                      <span className="w-4 text-center">{ch.chapter}</span>
+                      <span className="truncate">{ch.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
 
 export default function ChatView({
   caseId, chapter, search, sender, messageType, keyEvidence, weakPoints,
-  selectedId, onSelect, jumpToId,
+  selectedId, onSelect, jumpToId, showActions, chapters: chaptersList,
 }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatEvidence[]>([])
   const [total, setTotal] = useState(0)
@@ -305,6 +372,11 @@ export default function ChatView({
               isMatias={msg.sender?.toLowerCase().includes('matias') || msg.sender?.toLowerCase().includes('matías')}
               isSelected={selectedId === msg.id}
               onSelect={() => onSelect(msg)}
+              showActions={showActions}
+              chapters={chaptersList}
+              onUpdate={(id, updates) => {
+                setMessages(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m))
+              }}
             />
           ))}
         </div>
