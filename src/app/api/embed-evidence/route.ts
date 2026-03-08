@@ -234,6 +234,53 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // 6. Attorney context (evidence_type = 'attorney_context')
+    const { data: attorneyContext } = await supabaseServer
+      .from('evidence')
+      .select('*')
+      .eq('case_id', case_id)
+      .eq('evidence_type', 'attorney_context')
+
+    for (const ac of attorneyContext ?? []) {
+      const content = `[Contexto del abogado] ${ac.title}: ${ac.description ?? ''}`
+      if (content.trim().length > 30) {
+        const textChunks = chunkText(content)
+        for (let i = 0; i < textChunks.length; i++) {
+          chunks.push({
+            case_id,
+            source_table: 'attorney_context',
+            source_id: ac.id,
+            chapter: null,
+            content: textChunks.length > 1 ? `${textChunks[i]} [parte ${i + 1}/${textChunks.length}]` : textChunks[i],
+            metadata: { title: ac.title, date: ac.original_date },
+            embedding: [],
+          })
+        }
+      }
+    }
+
+    // 7. Video evidence (evidence_type = 'video')
+    const { data: videoEvidence } = await supabaseServer
+      .from('evidence')
+      .select('*')
+      .eq('case_id', case_id)
+      .eq('evidence_type', 'video')
+
+    for (const v of videoEvidence ?? []) {
+      const content = `[Video] ${v.title}: ${v.description ?? 'Sin descripción'}${v.original_source ? ` (Fuente: ${v.original_source})` : ''}${v.original_date ? ` (Fecha: ${v.original_date})` : ''}`
+      if (content.trim().length > 20) {
+        chunks.push({
+          case_id,
+          source_table: 'evidence_video',
+          source_id: v.id,
+          chapter: null,
+          content,
+          metadata: { title: v.title, source: v.original_source, date: v.original_date },
+          embedding: [],
+        })
+      }
+    }
+
     if (chunks.length === 0) {
       return NextResponse.json({ count: 0, message: 'No se encontró evidencia para embeber.' })
     }

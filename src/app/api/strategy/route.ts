@@ -20,6 +20,20 @@ export async function POST(req: NextRequest) {
     }
     const caseData = caseResult.data
 
+    // Fetch attorney context for this case
+    const { data: attorneyContext } = await supabaseServer
+      .from('evidence')
+      .select('title, description, original_date')
+      .eq('case_id', case_id)
+      .eq('evidence_type', 'attorney_context')
+
+    const attorneyNotes = (attorneyContext ?? [])
+      .map(ac => `[${ac.original_date || 'Sin fecha'}] ${ac.title}: ${ac.description || ''}`)
+      .join('\n')
+    const attorneySection = attorneyNotes
+      ? `\n\nNOTAS DEL ABOGADO:\n${attorneyNotes}`
+      : ''
+
     if (action === 'analyze') {
       if (!charges || charges.length === 0) {
         return NextResponse.json({ error: 'Se requiere al menos un cargo' }, { status: 400 })
@@ -55,7 +69,7 @@ IMPORTANTE:
 ${charges.map((c: { name: string; type: string; description: string }, i: number) => `${i + 1}. [${c.type.toUpperCase()}] ${c.name}: ${c.description}`).join('\n')}
 
 EVIDENCIA DISPONIBLE:
-${evidenceContext}
+${evidenceContext}${attorneySection}
 
 Analizá cada cargo contra la evidencia. Para cada uno evaluá:
 1. ¿Se puede sostener? ¿Qué tan fuerte es?
@@ -137,7 +151,7 @@ Responde SOLO en JSON válido con esta estructura:
 Descripción: ${charge.description}
 
 EVIDENCIA:
-${evidenceContext}
+${evidenceContext}${attorneySection}
 
 Hacé un análisis exhaustivo:
 1. Viabilidad legal (artículos específicos)

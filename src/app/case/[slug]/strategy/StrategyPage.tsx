@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Case } from '@/lib/types'
 
 interface Charge {
@@ -82,11 +82,144 @@ export default function StrategyPage({ caseData }: Props) {
   const [singleLoading, setSingleLoading] = useState<string | null>(null)
   const [singleAnalysis, setSingleAnalysis] = useState<Record<string, Record<string, unknown>>>({})
 
+  // Attorney context
+  const [contextText, setContextText] = useState('')
+  const [contextTitle, setContextTitle] = useState('')
+  const [contextSaving, setContextSaving] = useState(false)
+  const [contextEntries, setContextEntries] = useState<Array<{ id: string; title: string; description: string; original_date: string }>>([])
+
+  // Video evidence
+  const [videoTitle, setVideoTitle] = useState('')
+  const [videoDesc, setVideoDesc] = useState('')
+  const [videoDate, setVideoDate] = useState('')
+  const [videoLocation, setVideoLocation] = useState('')
+  const [videoSource, setVideoSource] = useState('')
+  const [videoLink, setVideoLink] = useState('')
+  const [videoSaving, setVideoSaving] = useState(false)
+
+  // Re-embed
+  const [embeddedCount, setEmbeddedCount] = useState<number | null>(null)
+  const [embedding, setEmbedding] = useState(false)
+  const [embedResult, setEmbedResult] = useState('')
+
   // New charge form
   const [newName, setNewName] = useState('')
   const [newType, setNewType] = useState<'cargo' | 'cautelar'>('cargo')
   const [newDesc, setNewDesc] = useState('')
   const [showPresets, setShowPresets] = useState(false)
+
+  // Load attorney context entries and embedded count
+  useEffect(() => {
+    loadContextEntries()
+    loadEmbeddedCount()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function loadContextEntries() {
+    try {
+      const res = await fetch(`/api/evidence?case_id=${caseData.id}&evidence_type=attorney_context`)
+      const data = await res.json()
+      if (data.evidence) setContextEntries(data.evidence)
+    } catch { /* ignore */ }
+  }
+
+  async function loadEmbeddedCount() {
+    try {
+      const res = await fetch(`/api/embed-evidence/count?case_id=${caseData.id}`)
+      const data = await res.json()
+      if (typeof data.count === 'number') setEmbeddedCount(data.count)
+    } catch { /* ignore */ }
+  }
+
+  async function saveContext() {
+    if (!contextText.trim()) return
+    setContextSaving(true)
+    try {
+      const res = await fetch('/api/evidence-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: caseData.id,
+          evidence_type: 'attorney_context',
+          title: contextTitle || 'Nota del abogado',
+          description: contextText,
+          date: new Date().toISOString().split('T')[0],
+        }),
+      })
+      const data = await res.json()
+      if (!data.error) {
+        setContextText('')
+        setContextTitle('')
+        loadContextEntries()
+      } else {
+        alert(data.error)
+      }
+    } catch (err) {
+      alert(`Error: ${err}`)
+    } finally {
+      setContextSaving(false)
+    }
+  }
+
+  async function saveVideo() {
+    if (!videoTitle.trim() || !videoDesc.trim()) return
+    setVideoSaving(true)
+    try {
+      const res = await fetch('/api/evidence-upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          case_id: caseData.id,
+          evidence_type: 'video',
+          title: videoTitle,
+          description: videoDesc,
+          date: videoDate || null,
+          location: videoLocation || null,
+          source: videoSource || null,
+          link: videoLink || null,
+        }),
+      })
+      const data = await res.json()
+      if (!data.error) {
+        setVideoTitle('')
+        setVideoDesc('')
+        setVideoDate('')
+        setVideoLocation('')
+        setVideoSource('')
+        setVideoLink('')
+        alert('Evidencia de video guardada')
+      } else {
+        alert(data.error)
+      }
+    } catch (err) {
+      alert(`Error: ${err}`)
+    } finally {
+      setVideoSaving(false)
+    }
+  }
+
+  async function reEmbed() {
+    setEmbedding(true)
+    setEmbedResult('')
+    try {
+      const res = await fetch('/api/embed-evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseData.id }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setEmbedResult(`Error: ${data.error}`)
+      } else {
+        setEmbedResult(data.message || `${data.count} fragmentos procesados`)
+        setEmbeddedCount(data.count)
+      }
+    } catch (err) {
+      setEmbedResult(`Error: ${err}`)
+    } finally {
+      setEmbedding(false)
+    }
+  }
 
   function addCharge(name: string, type: 'cargo' | 'cautelar', description: string) {
     const id = `charge-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
@@ -174,6 +307,125 @@ export default function StrategyPage({ caseData }: Props) {
         <p className="text-sm text-gray-500 mt-1">
           Definí los cargos y pedidos cautelares. La IA analiza la evidencia y evalúa la viabilidad de cada uno.
         </p>
+      </div>
+
+      {/* Attorney Context Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+        <h2 className="text-lg font-semibold text-gray-800">Contexto del Abogado</h2>
+        <p className="text-xs text-gray-500">Notas, observaciones y contexto que la IA considerará al analizar los cargos.</p>
+
+        {contextEntries.length > 0 && (
+          <div className="space-y-2">
+            {contextEntries.map(entry => (
+              <div key={entry.id} className="p-2 bg-gray-50 rounded border border-gray-100 text-sm">
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-800">{entry.title}</span>
+                  <span className="text-xs text-gray-400">{entry.original_date}</span>
+                </div>
+                <p className="text-gray-600 mt-1 whitespace-pre-wrap">{entry.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={contextTitle}
+            onChange={e => setContextTitle(e.target.value)}
+            placeholder="Título (ej: Conversación con testigo)"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+          <textarea
+            value={contextText}
+            onChange={e => setContextText(e.target.value)}
+            placeholder="Escribí notas, observaciones, contexto relevante del caso..."
+            rows={3}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+          />
+          <button
+            onClick={saveContext}
+            disabled={contextSaving || !contextText.trim()}
+            className="px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {contextSaving ? 'Guardando...' : 'Guardar Contexto'}
+          </button>
+        </div>
+      </div>
+
+      {/* Video Evidence Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+        <h2 className="text-lg font-semibold text-gray-800">Agregar Evidencia de Video</h2>
+        <p className="text-xs text-gray-500">Registrá videos como evidencia. La descripción será indexada para búsqueda.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <input
+            type="text"
+            value={videoTitle}
+            onChange={e => setVideoTitle(e.target.value)}
+            placeholder="Título del video *"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+          <input
+            type="text"
+            value={videoSource}
+            onChange={e => setVideoSource(e.target.value)}
+            placeholder="Fuente (ej: Instagram, WhatsApp)"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+          <input
+            type="date"
+            value={videoDate}
+            onChange={e => setVideoDate(e.target.value)}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+          <input
+            type="text"
+            value={videoLocation}
+            onChange={e => setVideoLocation(e.target.value)}
+            placeholder="Ubicación"
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+          <input
+            type="url"
+            value={videoLink}
+            onChange={e => setVideoLink(e.target.value)}
+            placeholder="Link/URL del video"
+            className="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500"
+          />
+        </div>
+        <textarea
+          value={videoDesc}
+          onChange={e => setVideoDesc(e.target.value)}
+          placeholder="Descripción de lo que se ve en el video (esto se usará para búsqueda) *"
+          rows={2}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 resize-y"
+        />
+        <button
+          onClick={saveVideo}
+          disabled={videoSaving || !videoTitle.trim() || !videoDesc.trim()}
+          className="px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {videoSaving ? 'Guardando...' : 'Guardar Video'}
+        </button>
+      </div>
+
+      {/* Re-embed Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between gap-4">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-800">Embeddings de Evidencia</h2>
+          <p className="text-xs text-gray-500">
+            {embeddedCount !== null ? `${embeddedCount} fragmentos indexados` : 'Cargando...'}
+            {embedResult && <span className="ml-2 text-green-700">{embedResult}</span>}
+          </p>
+        </div>
+        <button
+          onClick={reEmbed}
+          disabled={embedding}
+          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 flex-shrink-0"
+        >
+          {embedding ? 'Procesando...' : 'Re-embeddear Evidencia'}
+        </button>
       </div>
 
       {/* Add Charges Section */}

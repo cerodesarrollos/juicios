@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
 
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const case_id = searchParams.get('case_id')
+  const evidence_type = searchParams.get('evidence_type')
+
+  if (!case_id) {
+    return NextResponse.json({ error: 'case_id requerido' }, { status: 400 })
+  }
+
+  let query = supabaseServer
+    .from('evidence')
+    .select('id, title, description, original_date, evidence_type')
+    .eq('case_id', case_id)
+    .order('created_at', { ascending: false })
+
+  if (evidence_type) {
+    query = query.eq('evidence_type', evidence_type)
+  }
+
+  const { data, error } = await query
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ evidence: data })
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   const { data, error } = await supabaseServer

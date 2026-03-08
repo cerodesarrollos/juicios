@@ -58,6 +58,12 @@ export function formatEvidenceForPrompt(chunks: EvidenceChunk[]): string {
         ? 'Timeline'
         : chunk.source_table === 'transactions'
         ? 'Transacción'
+        : chunk.source_table === 'attorney_context'
+        ? 'Nota del abogado'
+        : chunk.source_table === 'evidence_video'
+        ? 'Video'
+        : chunk.source_table === 'evidence_pdf'
+        ? 'PDF'
         : chunk.source_table
       return `${i + 1}. [${source}] ${chunk.content}`
     })
