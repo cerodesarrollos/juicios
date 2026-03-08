@@ -51,7 +51,14 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
   useEffect(() => {
     if (showChapterMenu && chapterBtnRef.current) {
       const rect = chapterBtnRef.current.getBoundingClientRect()
-      setMenuPos({ top: rect.bottom + 4, left: rect.left })
+      const menuHeight = 200 // approximate
+      const spaceBelow = window.innerHeight - rect.bottom
+      if (spaceBelow < menuHeight) {
+        // Open upward
+        setMenuPos({ top: rect.top - menuHeight - 4, left: rect.left })
+      } else {
+        setMenuPos({ top: rect.bottom + 4, left: rect.left })
+      }
     }
     if (!showChapterMenu) setMenuPos(null)
   }, [showChapterMenu])
@@ -279,7 +286,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
                 <>
                   <div className="fixed inset-0 z-[9998]" onClick={() => setShowChapterMenu(false)} />
                   <div
-                    className="fixed z-[9999] w-48 rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200"
+                    className="fixed z-[9999] w-52 max-h-[200px] overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200"
                     style={{ top: menuPos.top, left: menuPos.left }}
                   >
                     {chapters.map(ch => (
