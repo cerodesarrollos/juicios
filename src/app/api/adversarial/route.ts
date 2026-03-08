@@ -108,7 +108,8 @@ async function generateRound(
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { case_id, action, user_input } = body
+  const { case_id, action, user_input, model: modelKey } = body
+  const MODEL = AVAILABLE_MODELS[modelKey as string] || DEFAULT_MODEL
 
   if (!case_id || !action) {
     return NextResponse.json({ error: 'case_id y action son requeridos' }, { status: 400 })

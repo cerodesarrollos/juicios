@@ -23,12 +23,20 @@ export default function AdversarialPage({ caseData }: Props) {
   const [counterInput, setCounterInput] = useState('')
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null)
   const [evalLoading, setEvalLoading] = useState(false)
+  const [selectedModel, setSelectedModel] = useState('opus-4')
+
+  const models = [
+    { key: 'opus-4', label: 'Claude Opus 4', desc: 'Máxima calidad' },
+    { key: 'sonnet-4', label: 'Claude Sonnet 4', desc: 'Rápido y preciso' },
+    { key: 'sonnet-3.5', label: 'Claude Sonnet 3.5', desc: 'Económico' },
+    { key: 'haiku-3.5', label: 'Claude Haiku 3.5', desc: 'Ultra rápido' },
+  ]
 
   async function apiCall(action: string, extra: Record<string, unknown> = {}) {
     const res = await fetch('/api/adversarial', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ case_id: caseData.id, action, current_rounds: session?.rounds.length ?? 0, ...extra }),
+      body: JSON.stringify({ case_id: caseData.id, action, model: selectedModel, current_rounds: session?.rounds.length ?? 0, ...extra }),
     })
     return res.json()
   }
@@ -110,6 +118,18 @@ export default function AdversarialPage({ caseData }: Props) {
           <div>
             <h1 className="text-xl font-bold text-gray-900">Simulacion Adversarial</h1>
             <p className="text-sm text-gray-500">{caseData.plaintiff_name} vs {caseData.defendant_name}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <label className="text-xs text-gray-500">Modelo:</label>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none"
+              >
+                {models.map((m) => (
+                  <option key={m.key} value={m.key}>{m.label} — {m.desc}</option>
+                ))}
+              </select>
+            </div>
           </div>
           {session && (
             <div className="flex flex-wrap items-center gap-3">
