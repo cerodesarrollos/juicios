@@ -20,9 +20,11 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   return (
     <>
       <Sidebar />
-      <main className="ml-0 min-h-screen md:ml-56">
+      <main className="ml-0 min-h-screen bg-gray-100 md:ml-56">
         <div className="mx-auto max-w-7xl p-4 md:p-6">
-          {children}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200">
+            {children}
+          </div>
         </div>
       </main>
     </>
