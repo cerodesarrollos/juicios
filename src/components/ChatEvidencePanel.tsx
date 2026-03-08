@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { ChatEvidence } from '@/lib/types'
 
 interface ChatEvidencePanelProps {
@@ -31,6 +32,7 @@ function typeLabel(type: string) {
 }
 
 export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
+  const [lightbox, setLightbox] = useState(false)
   if (!message) {
     return (
       <div className="flex h-full flex-col items-center justify-center text-gray-400 p-8">
@@ -131,18 +133,76 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
         </div>
       )}
 
-      {/* Image/Video placeholder */}
-      {(message.message_type === 'image' || message.message_type === 'video') && (
+      {/* Image preview */}
+      {message.message_type === 'image' && (
         <div>
-          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            {message.message_type === 'image' ? 'Imagen' : 'Video'}
-          </p>
-          <div className="flex h-48 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-400">
-            <div className="text-center">
-              <span className="text-4xl">{message.message_type === 'image' ? '\u{1F5BC}' : '\u{1F3AC}'}</span>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">Imagen</p>
+          {message.file_url ? (
+            <>
+              <div
+                className="overflow-hidden rounded-xl border border-gray-200 cursor-pointer hover:ring-2 hover:ring-green-400 transition-all"
+                onClick={() => setLightbox(true)}
+              >
+                <img
+                  src={message.file_url}
+                  alt={message.file_name || 'Imagen'}
+                  className="w-full object-contain max-h-[400px]"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-400">{message.file_name}</p>
+
+              {/* Lightbox */}
+              {lightbox && (
+                <div
+                  className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4"
+                  onClick={() => setLightbox(false)}
+                >
+                  <button
+                    className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white text-xl hover:bg-white/40"
+                    onClick={() => setLightbox(false)}
+                  >
+                    ✕
+                  </button>
+                  <img
+                    src={message.file_url}
+                    alt={message.file_name || 'Imagen'}
+                    className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex h-48 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-400">
+              <span className="text-4xl">🖼️</span>
               <p className="mt-1 text-xs">{message.file_name || 'Sin archivo'}</p>
             </div>
-          </div>
+          )}
+        </div>
+      )}
+
+      {/* Video preview */}
+      {message.message_type === 'video' && (
+        <div>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">Video</p>
+          {message.file_url ? (
+            <>
+              <div className="overflow-hidden rounded-xl border border-gray-200">
+                <video
+                  src={message.file_url}
+                  controls
+                  preload="metadata"
+                  className="w-full max-h-[400px]"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-400">{message.file_name}</p>
+            </>
+          ) : (
+            <div className="flex h-48 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-400">
+              <span className="text-4xl">🎬</span>
+              <p className="mt-1 text-xs">{message.file_name || 'Sin archivo'}</p>
+            </div>
+          )}
         </div>
       )}
 

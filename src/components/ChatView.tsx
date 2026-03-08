@@ -134,11 +134,11 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               <img
                 src={msg.file_url}
                 alt={msg.file_name || 'Imagen'}
-                className="max-w-[260px] w-full rounded-lg cursor-pointer"
+                className="max-w-[260px] w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                 loading="lazy"
                 onClick={(e) => {
                   e.stopPropagation()
-                  window.open(msg.file_url!, '_blank')
+                  onSelect()
                 }}
               />
             </div>
