@@ -129,17 +129,43 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         )}
 
         {isImage && (
-          <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
-            <span className="text-2xl">&#128247;</span>
-            <span>{msg.file_name || 'Imagen'}</span>
-          </div>
+          msg.file_url ? (
+            <div className="relative -mx-1 -mt-0.5 mb-1 overflow-hidden rounded-lg">
+              <img
+                src={msg.file_url}
+                alt={msg.file_name || 'Imagen'}
+                className="max-w-[260px] w-full rounded-lg cursor-pointer"
+                loading="lazy"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  window.open(msg.file_url!, '_blank')
+                }}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+              <span className="text-2xl">📷</span>
+              <span>{msg.file_name || 'Imagen'}</span>
+            </div>
+          )
         )}
 
         {isVideo && (
-          <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
-            <span className="text-2xl">&#127909;</span>
-            <span>{msg.file_name || 'Video'}</span>
-          </div>
+          msg.file_url ? (
+            <div className="relative -mx-1 -mt-0.5 mb-1 overflow-hidden rounded-lg">
+              <video
+                src={msg.file_url}
+                controls
+                preload="metadata"
+                className="max-w-[260px] w-full rounded-lg"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+              <span className="text-2xl">🎬</span>
+              <span>{msg.file_name || 'Video'}</span>
+            </div>
+          )
         )}
 
         {isDocument && (
