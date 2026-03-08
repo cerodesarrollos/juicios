@@ -97,12 +97,12 @@ function parseClaudeJSON(text: string): unknown {
   return JSON.parse(cleaned)
 }
 
-async function generateRound(
+async function generateRound(model: string, 
   systemPrompt: string,
   userPrompt: string,
 ): Promise<AdversarialRound> {
   const response = await anthropic.messages.create({
-    model: MODEL,
+    model,
     max_tokens: 4096,
     system: systemPrompt,
     messages: [{ role: 'user', content: userPrompt }],
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence)
 
     if (action === 'init') {
-      const round = await generateRound(systemPrompt, `Genera la Ronda 1 de la simulación adversarial para este caso. Analiza la evidencia disponible y genera argumentos de acusación y defensa.
+      const round = await generateRound(MODEL, systemPrompt, `Genera la Ronda 1 de la simulación adversarial para este caso. Analiza la evidencia disponible y genera argumentos de acusación y defensa.
 
 Responde en este formato JSON exacto:
 {
@@ -172,7 +172,7 @@ Responde en este formato JSON exacto:
         ? `\n\nRONDAS ANTERIORES:\n${JSON.stringify(previousRounds, null, 2)}`
         : ''
 
-      const round = await generateRound(systemPrompt, `Genera la Ronda ${roundNum} de la simulación adversarial.${previousContext}
+      const round = await generateRound(MODEL, systemPrompt, `Genera la Ronda ${roundNum} de la simulación adversarial.${previousContext}
 
 Construye sobre las rondas anteriores. Introduce nuevos argumentos, no repitas los anteriores. Cada lado debe intentar superar los puntos del otro.
 
