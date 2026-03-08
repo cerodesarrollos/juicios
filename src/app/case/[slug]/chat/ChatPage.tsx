@@ -17,8 +17,16 @@ const chapterIcons = ['', '\u2460', '\u2461', '\u2462', '\u2463', '\u2464']
 
 export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPageProps) {
   const searchParams = useSearchParams()
-  const initialChapter = searchParams.get('chapter') ? parseInt(searchParams.get('chapter')!, 10) : null
-  const [selectedChapter, setSelectedChapter] = useState<number | null>(initialChapter)
+  const chapterParam = searchParams.get('chapter')
+  const [selectedChapter, setSelectedChapter] = useState<number | null>(
+    chapterParam ? parseInt(chapterParam, 10) : null
+  )
+
+  // Sync with URL changes (sidebar navigation)
+  useEffect(() => {
+    const ch = searchParams.get('chapter')
+    setSelectedChapter(ch ? parseInt(ch, 10) : null)
+  }, [searchParams])
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [sender, setSender] = useState('')
