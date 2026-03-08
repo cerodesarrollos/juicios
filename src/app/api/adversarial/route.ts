@@ -18,14 +18,16 @@ async function fetchCaseContext(caseId: string) {
 
   let evidence: Record<string, unknown>[] = []
   let chatEvidence: Record<string, unknown>[] = []
+  let transcriptions: Record<string, unknown>[] = []
+  let timeline: Record<string, unknown>[] = []
+  let transactions: Record<string, unknown>[] = []
 
   try {
-    const evidenceResult = await supabaseServer.from('evidence').select('*').eq('case_id', caseId)
-    evidence = evidenceResult.data ?? []
-  } catch { /* table may not exist */ }
+    const r = await supabaseServer.from('evidence').select('*').eq('case_id', caseId)
+    evidence = r.data ?? []
+  } catch {}
 
   try {
-    // First get ALL key evidence and weak points (these are most important)
     const keyResult = await supabaseServer
       .from('chat_evidence')
       .select('*')
@@ -33,29 +35,36 @@ async function fetchCaseContext(caseId: string) {
       .or('is_key_evidence.eq.true,is_weak_point.eq.true')
       .order('chapter,sort_order')
       .limit(500)
-    
-    // Then get a sample from EACH chapter to ensure coverage
-    const allChaptersResult = await supabaseServer
+    const allResult = await supabaseServer
       .from('chat_evidence')
       .select('*')
       .eq('case_id', caseId)
       .order('chapter,sort_order')
       .range(0, 4999)
-    
-    // Merge: key evidence first, then fill with chapter samples
     const keyIds = new Set((keyResult.data ?? []).map((r: Record<string, unknown>) => r.id))
-    const remaining = (allChaptersResult.data ?? []).filter((r: Record<string, unknown>) => !keyIds.has(r.id))
+    const remaining = (allResult.data ?? []).filter((r: Record<string, unknown>) => !keyIds.has(r.id))
     chatEvidence = [...(keyResult.data ?? []), ...remaining]
-  } catch { /* table may not exist */ }
+  } catch {}
 
-  return {
-    caseData: caseResult.data,
-    evidence,
-    chatEvidence,
-  }
+  try {
+    const r = await supabaseServer.from('transcriptions').select('*').eq('case_id', caseId)
+    transcriptions = r.data ?? []
+  } catch {}
+
+  try {
+    const r = await supabaseServer.from('timeline_events').select('*').eq('case_id', caseId).order('date')
+    timeline = r.data ?? []
+  } catch {}
+
+  try {
+    const r = await supabaseServer.from('transactions').select('*').eq('case_id', caseId).order('date')
+    transactions = r.data ?? []
+  } catch {}
+
+  return { caseData: caseResult.data, evidence, chatEvidence, transcriptions, timeline, transactions }
 }
 
-function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<string, unknown>[], chatEvidence: Record<string, unknown>[]) {
+function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<string, unknown>[], chatEvidence: Record<string, unknown>[], transcriptions: Record<string, unknown>[] = [], timeline: Record<string, unknown>[] = [], transactions: Record<string, unknown>[] = []) {
   const evidenceSummary = evidence
     .map((e) => `- [${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`)
     .join('\n')
@@ -66,7 +75,19 @@ function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<s
   const orderedEvidence = [...keyEvidence, ...regularEvidence]
 
   const chatSummary = orderedEvidence
-    .map((ce) => `- Cap.${ce.chapter} (${ce.sender}, ${ce.message_date}): ${ce.message_text ?? ce.file_name ?? 'archivo'}${ce.is_key_evidence ? ' [EVIDENCIA CLAVE]' : ''}${ce.is_weak_point ? ` [PUNTO DÉBIL: ${ce.weak_point_note}]` : ''}`)
+    .map((ce) => `- Cap.${ce.chapter} (${ce.sender}, ${ce.message_date}): ${ce.message_text ?? ce.transcription ?? ce.file_name ?? 'archivo'}${ce.is_key_evidence ? ' [EVIDENCIA CLAVE]' : ''}${ce.is_weak_point ? ` [PUNTO DÉBIL: ${ce.weak_point_note}]` : ''}`)
+    .join('\n')
+
+  const transcriptionSummary = transcriptions
+    .map((t) => `- Transcripción (evidencia ${t.evidence_id}): ${(t.text as string)?.substring(0, 500) ?? 'Sin texto'}`)
+    .join('\n')
+
+  const timelineSummary = timeline
+    .map((t) => `- ${t.date} [${t.type}]: ${t.title}${t.description ? ' — ' + t.description : ''}`)
+    .join('\n')
+
+  const transactionSummary = transactions
+    .map((t) => `- ${t.date} | ${t.type ?? 'pago'} | ${t.currency ?? 'USD'} ${t.amount} | ${t.description ?? t.concept ?? 'Sin concepto'}`)
     .join('\n')
 
   return `Eres un experto analista legal argentino. Tu trabajo es generar simulaciones adversariales de alta calidad para casos legales.
@@ -79,8 +100,17 @@ ESTADO: ${caseData.status ?? 'No especificado'}
 EVIDENCIA DISPONIBLE:
 ${evidenceSummary || 'No hay evidencia cargada.'}
 
-MENSAJES/CHAT DE EVIDENCIA (primeros 50):
+MENSAJES/CHAT DE EVIDENCIA:
 ${chatSummary || 'No hay mensajes de chat.'}
+
+TRANSCRIPCIONES DE AUDIOS/VIDEOS:
+${transcriptionSummary || 'No hay transcripciones.'}
+
+CRONOLOGÍA DE HECHOS:
+${timelineSummary || 'No hay eventos en la cronología.'}
+
+TRANSACCIONES/TRANSFERENCIAS:
+${transactionSummary || 'No hay transacciones registradas.'}
 
 REGLAS:
 - Responde SIEMPRE en español
@@ -124,7 +154,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { caseData, evidence, chatEvidence } = await fetchCaseContext(case_id)
-    const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence)
+    const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence, transcriptions, timeline, transactions)
 
     if (action === 'init') {
       const round = await generateRound(MODEL, systemPrompt, `Genera la Ronda 1 de la simulación adversarial para este caso. Analiza la evidencia disponible y genera argumentos de acusación y defensa.
