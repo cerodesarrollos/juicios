@@ -363,10 +363,11 @@ Responde en este formato JSON exacto:
       const searchResults = await searchEvidence(case_id, user_input || '', 40)
       const evidenceContext = formatEvidenceForPrompt(searchResults)
 
+      const { systemPrompt: buildSystemPrompt } = await getSystemPrompt(case_id, user_input || 'construir argumento')
       const response = await anthropic.messages.create({
         model: MODEL,
         max_tokens: 4096,
-        system: ragSystemPrompt,
+        system: buildSystemPrompt,
         messages: [{
           role: 'user',
           content: `El abogado del DEMANDANTE quiere construir el siguiente argumento:
