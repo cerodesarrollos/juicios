@@ -20,9 +20,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div className="min-h-screen bg-gray-200 md:p-4 lg:p-5">
-      <div className="mx-auto max-w-[1600px] overflow-hidden bg-white shadow-xl md:rounded-2xl md:ring-1 md:ring-gray-200" style={{ minHeight: 'calc(100vh - 40px)' }}>
-        <div className="flex relative" style={{ minHeight: 'calc(100vh - 40px)' }}>
+    <div className="h-screen overflow-hidden bg-gray-200 md:p-4 lg:p-5">
+      <div className="mx-auto h-full max-h-full max-w-[1600px] overflow-hidden bg-white shadow-xl md:rounded-2xl md:ring-1 md:ring-gray-200 md:h-[calc(100vh-40px)]">
+        <div className="flex h-full relative">
 
           {/* Mobile hamburger */}
           <button
@@ -57,8 +57,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
             />
           )}
 
-          {/* Main content */}
-          <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto p-4 pt-14 md:p-6 md:pt-6">
+          {/* Main content — scroll is here */}
+          <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto p-4 pt-14 md:p-6 md:pt-6 h-full">
             {children}
           </main>
         </div>
