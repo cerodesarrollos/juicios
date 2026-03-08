@@ -57,13 +57,6 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
 
   return (
     <aside className="no-print flex h-full w-56 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
-      <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl">&#9878;</span>
-          <span className="text-lg font-bold text-green-800">Juicios</span>
-        </Link>
-      </div>
-
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
         <Link
           href="/"

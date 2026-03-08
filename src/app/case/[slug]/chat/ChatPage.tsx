@@ -72,7 +72,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
   const hasFilters = selectedChapter !== null || search || sender || messageType || keyEvidence || weakPoints
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-full flex-col">
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2.5">
         <div className="flex items-center gap-3">
