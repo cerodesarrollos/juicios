@@ -1,58 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AdversarialRound, AdversarialSession } from '@/lib/types'
+import { anthropic } from '@/lib/anthropic'
+import { supabaseServer } from '@/lib/supabase-server'
 
-function mockRound(number: number): AdversarialRound {
-  const rounds: AdversarialRound[] = [
-    {
-      number: 1,
-      prosecution: {
-        argument: 'El demandado recibio transferencias bancarias por un total de USD 45,000 entre marzo y julio de 2024, segun consta en los comprobantes de transferencia adjuntos. Cada transferencia fue realizada desde la cuenta del demandante con concepto explicito de "prestamo personal", lo cual constituye prueba directa de la obligacion de devolucion.',
-        evidence_refs: ['Comprobantes de transferencia P-001 a P-015', 'Extractos bancarios del demandante'],
-        legal_articles: ['Art. 1525 CCyC - Contrato de mutuo', 'Art. 1527 CCyC - Obligacion del mutuario'],
-        strength: 8,
-      },
-      defense: {
-        counterargument: 'Las transferencias bancarias por si solas no prueban la existencia de un contrato de mutuo. El concepto "prestamo personal" fue colocado unilateralmente por el transferente. No existe contrato firmado, ni testigos del acuerdo, ni comunicacion previa donde se pacten condiciones de devolucion. Las transferencias podrian responder a pagos por servicios, regalos, o aportes societarios informales.',
-        evidence_refs: ['Ausencia de contrato escrito', 'Historial de mensajes sin mencion a prestamo'],
-        legal_articles: ['Art. 1019 CCyC - Medios de prueba', 'Art. 1020 CCyC - Prueba de los contratos formales'],
-        strength: 6,
-      },
-      round_winner: 'prosecution',
-    },
-    {
-      number: 2,
-      prosecution: {
-        argument: 'Existen mensajes de WhatsApp donde el demandado reconoce expresamente la deuda y solicita plazos para la devolucion. En fecha 15/08/2024 el demandado escribio: "Ya se que te debo, dame hasta fin de mes". Este reconocimiento constituye prueba confesoria extrajudicial conforme la legislacion vigente.',
-        evidence_refs: ['Capturas de WhatsApp certificadas notarialmente', 'Certificacion notarial de fecha 20/09/2024'],
-        legal_articles: ['Art. 733 CCyC - Reconocimiento de la obligacion', 'Art. 319 CCyC - Valor probatorio de correspondencia'],
-        strength: 9,
-      },
-      defense: {
-        counterargument: 'Las capturas de pantalla de WhatsApp presentadas carecen de certificacion pericial informatica que garantice su integridad. La frase "ya se que te debo" es ambigua y podria referirse a una deuda moral, un favor pendiente, o cualquier otra obligacion no dineraria. Sin peritaje informatico forense, estas pruebas no deberian ser admitidas como confesion extrajudicial.',
-        evidence_refs: ['Falta de peritaje informatico', 'Ambiguedad del mensaje citado'],
-        legal_articles: ['Art. 287 CCyC - Instrumentos privados y particulares', 'Art. 319 CCyC - Valor probatorio'],
-        strength: 5,
-      },
-      round_winner: 'prosecution',
-    },
-    {
-      number: 3,
-      prosecution: {
-        argument: 'El demandado no ha podido justificar el origen licito de los fondos recibidos ni demostrar contraprestacion alguna por las sumas transferidas. La carga de la prueba recae sobre quien alega un hecho modificativo o extintivo de la obligacion. El silencio y la falta de justificacion refuerzan la posicion acusatoria.',
-        evidence_refs: ['Informe BCRA sobre movimientos del demandado', 'Declaraciones juradas de AFIP'],
-        legal_articles: ['Art. 710 CCyC - Carga de la prueba', 'Art. 1028 CCyC - Interpretacion contra el predisponente'],
-        strength: 7,
-      },
-      defense: {
-        counterargument: 'La inversion de la carga probatoria no opera automaticamente. Es el demandante quien debe probar la existencia del contrato de mutuo con todos sus elementos: consentimiento, objeto y causa. La mera transferencia de dinero no presupone obligacion de devolucion. Ademas, el demandado ha mantenido una relacion comercial con el demandante que podria explicar los movimientos de fondos.',
-        evidence_refs: ['Relacion comercial preexistente', 'Facturas de servicios entre las partes'],
-        legal_articles: ['Art. 1013 CCyC - Causa del contrato', 'Art. 710 CCyC - Principio general de carga probatoria'],
-        strength: 7,
-      },
-      round_winner: 'draw',
-    },
-  ]
-  return rounds[(number - 1) % rounds.length]
+const MODEL = 'claude-opus-4-0-20250514'
+
+async function fetchCaseContext(caseId: string) {
+  const [caseResult, evidenceResult, chatEvidenceResult] = await Promise.all([
+    supabaseServer.from('cases').select('*').eq('id', caseId).single(),
+    supabaseServer.from('evidence').select('*').eq('case_id', caseId),
+    supabaseServer.from('chat_evidence').select('*').eq('case_id', caseId).order('sort_order'),
+  ])
+
+  if (caseResult.error) throw new Error(`Error al cargar caso: ${caseResult.error.message}`)
+
+  return {
+    caseData: caseResult.data,
+    evidence: evidenceResult.data ?? [],
+    chatEvidence: chatEvidenceResult.data ?? [],
+  }
+}
+
+function buildSystemPrompt(caseData: Record<string, unknown>, evidence: Record<string, unknown>[], chatEvidence: Record<string, unknown>[]) {
+  const evidenceSummary = evidence
+    .map((e) => `- [${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`)
+    .join('\n')
+
+  const chatSummary = chatEvidence
+    .slice(0, 50)
+    .map((ce) => `- Cap.${ce.chapter} (${ce.sender}, ${ce.message_date}): ${ce.message_text ?? ce.file_name ?? 'archivo'}${ce.is_key_evidence ? ' [EVIDENCIA CLAVE]' : ''}${ce.is_weak_point ? ` [PUNTO DÉBIL: ${ce.weak_point_note}]` : ''}`)
+    .join('\n')
+
+  return `Eres un experto analista legal argentino. Tu trabajo es generar simulaciones adversariales de alta calidad para casos legales.
+
+CASO: ${caseData.title ?? 'Sin título'}
+DESCRIPCIÓN: ${caseData.description ?? 'Sin descripción'}
+TIPO: ${caseData.case_type ?? 'No especificado'}
+ESTADO: ${caseData.status ?? 'No especificado'}
+
+EVIDENCIA DISPONIBLE:
+${evidenceSummary || 'No hay evidencia cargada.'}
+
+MENSAJES/CHAT DE EVIDENCIA (primeros 50):
+${chatSummary || 'No hay mensajes de chat.'}
+
+REGLAS:
+- Responde SIEMPRE en español
+- Cita artículos REALES del Código Civil y Comercial de la Nación (CCyC) y del Código Penal argentino
+- Las referencias a evidencia deben mencionar la evidencia REAL del caso listada arriba
+- La defensa debe ser genuinamente fuerte — busca debilidades REALES en la acusación
+- El puntaje de fuerza va de 1 a 10
+- Responde SIEMPRE en formato JSON válido, sin markdown ni bloques de código`
+}
+
+function parseClaudeJSON(text: string): unknown {
+  // Strip markdown code fences if present
+  const cleaned = text.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '').trim()
+  return JSON.parse(cleaned)
+}
+
+async function generateRound(
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<AdversarialRound> {
+  const response = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 4096,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userPrompt }],
+  })
+
+  const text = response.content[0].type === 'text' ? response.content[0].text : ''
+  const parsed = parseClaudeJSON(text) as AdversarialRound
+  return parsed
 }
 
 export async function POST(req: NextRequest) {
@@ -63,71 +83,171 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'case_id y action son requeridos' }, { status: 400 })
   }
 
-  // Mock session — real AI integration comes later
-  if (action === 'init') {
-    const round1 = mockRound(1)
-    const session: AdversarialSession = {
-      id: crypto.randomUUID(),
-      case_id,
-      rounds: [round1],
-      overall_score: {
-        prosecution: round1.prosecution.strength,
-        defense: round1.defense.strength,
-        unresolved_points: 2,
-        resolved_points: 1,
-      },
-      status: 'active',
+  try {
+    const { caseData, evidence, chatEvidence } = await fetchCaseContext(case_id)
+    const systemPrompt = buildSystemPrompt(caseData, evidence, chatEvidence)
+
+    if (action === 'init') {
+      const round = await generateRound(systemPrompt, `Genera la Ronda 1 de la simulación adversarial para este caso. Analiza la evidencia disponible y genera argumentos de acusación y defensa.
+
+Responde en este formato JSON exacto:
+{
+  "number": 1,
+  "prosecution": {
+    "argument": "argumento detallado de la acusación citando evidencia real del caso",
+    "evidence_refs": ["referencias a evidencia real del caso"],
+    "legal_articles": ["Art. X CCyC - descripción breve"],
+    "strength": 8
+  },
+  "defense": {
+    "counterargument": "contraargumento detallado de la defensa",
+    "evidence_refs": ["referencias a evidencia o falta de ella"],
+    "legal_articles": ["Art. X CCyC - descripción breve"],
+    "strength": 6
+  },
+  "round_winner": "prosecution"
+}`)
+
+      round.number = 1
+
+      const session: AdversarialSession = {
+        id: crypto.randomUUID(),
+        case_id,
+        rounds: [round],
+        overall_score: {
+          prosecution: round.prosecution.strength,
+          defense: round.defense.strength,
+          unresolved_points: 2,
+          resolved_points: 1,
+        },
+        status: 'active',
+      }
+      return NextResponse.json(session)
     }
-    return NextResponse.json(session)
-  }
 
-  if (action === 'auto') {
-    const roundNum = (body.current_rounds ?? 0) + 1
-    const round = mockRound(roundNum)
-    return NextResponse.json({ round })
-  }
+    if (action === 'auto') {
+      const previousRounds = body.previous_rounds as AdversarialRound[] | undefined
+      const roundNum = (body.current_rounds ?? 0) + 1
 
-  if (action === 'counter') {
-    const round: AdversarialRound = {
-      number: (body.current_rounds ?? 0) + 1,
-      prosecution: {
-        argument: user_input || 'Argumento manual del usuario.',
-        evidence_refs: [],
-        legal_articles: [],
-        strength: 6,
-      },
-      defense: {
-        counterargument: 'El argumento presentado carece de sustento probatorio suficiente. No se han aportado elementos nuevos que modifiquen la posicion de la defensa. Se solicita que se desestime por falta de fundamentacion adecuada y se mantenga la posicion defensiva establecida en rondas anteriores.',
-        evidence_refs: ['Argumentos previos de la defensa'],
-        legal_articles: ['Art. 1019 CCyC - Medios de prueba'],
-        strength: 5,
-      },
-      round_winner: 'prosecution',
+      const previousContext = previousRounds
+        ? `\n\nRONDAS ANTERIORES:\n${JSON.stringify(previousRounds, null, 2)}`
+        : ''
+
+      const round = await generateRound(systemPrompt, `Genera la Ronda ${roundNum} de la simulación adversarial.${previousContext}
+
+Construye sobre las rondas anteriores. Introduce nuevos argumentos, no repitas los anteriores. Cada lado debe intentar superar los puntos del otro.
+
+Responde en este formato JSON exacto:
+{
+  "number": ${roundNum},
+  "prosecution": {
+    "argument": "nuevo argumento que avanza la posición acusatoria",
+    "evidence_refs": ["referencias a evidencia"],
+    "legal_articles": ["Art. X CCyC - descripción"],
+    "strength": 7
+  },
+  "defense": {
+    "counterargument": "nuevo contraargumento que avanza la defensa",
+    "evidence_refs": ["referencias a evidencia"],
+    "legal_articles": ["Art. X CCyC - descripción"],
+    "strength": 7
+  },
+  "round_winner": "prosecution" | "defense" | "draw"
+}`)
+
+      round.number = roundNum
+      return NextResponse.json({ round })
     }
-    return NextResponse.json({ round })
-  }
 
-  if (action === 'evaluate') {
-    return NextResponse.json({
-      evaluation: {
-        overall_strength: 7.5,
-        prosecution_score: 8,
-        defense_score: 6,
-        summary: 'La posicion acusatoria presenta una fortaleza considerable basada en evidencia documental solida (transferencias bancarias) y reconocimiento parcial de la deuda via mensajeria. Los puntos debiles de la acusacion se centran en la falta de un contrato formal de mutuo. La defensa tiene argumentos validos sobre la ambiguedad de las pruebas digitales, pero el conjunto probatorio favorece al demandante.',
-        strong_points: [
-          'Comprobantes de transferencia con concepto explicito',
-          'Reconocimiento parcial via WhatsApp',
-          'Falta de justificacion del demandado sobre el destino de fondos',
-        ],
-        weak_points: [
-          'Ausencia de contrato formal de mutuo',
-          'Capturas de WhatsApp sin peritaje informatico forense',
-          'Posible relacion comercial que justifique transferencias',
-        ],
-        recommendation: 'Se recomienda obtener peritaje informatico de las conversaciones de WhatsApp y solicitar informes bancarios completos del demandado para fortalecer la posicion acusatoria. Considerar la posibilidad de mediacion dado el reconocimiento parcial de la deuda.',
-      },
-    })
-  }
+    if (action === 'counter') {
+      const roundNum = (body.current_rounds ?? 0) + 1
+      const previousRounds = body.previous_rounds as AdversarialRound[] | undefined
 
-  return NextResponse.json({ error: 'Accion no reconocida' }, { status: 400 })
+      const previousContext = previousRounds
+        ? `\n\nRONDAS ANTERIORES:\n${JSON.stringify(previousRounds, null, 2)}`
+        : ''
+
+      const response = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: `El usuario ha presentado el siguiente argumento de acusación:
+
+"${user_input}"
+${previousContext}
+
+Genera ÚNICAMENTE el contraargumento de la defensa. Debe ser un contraargumento fuerte y bien fundamentado que busque debilidades reales en el argumento presentado.
+
+Responde en este formato JSON exacto:
+{
+  "number": ${roundNum},
+  "prosecution": {
+    "argument": "${user_input?.replace(/"/g, '\\"') ?? ''}",
+    "evidence_refs": [],
+    "legal_articles": [],
+    "strength": 6
+  },
+  "defense": {
+    "counterargument": "contraargumento fuerte y detallado",
+    "evidence_refs": ["referencias a evidencia"],
+    "legal_articles": ["Art. X CCyC - descripción"],
+    "strength": 7
+  },
+  "round_winner": "defense" | "prosecution" | "draw"
+}`,
+        }],
+      })
+
+      const text = response.content[0].type === 'text' ? response.content[0].text : ''
+      const round = parseClaudeJSON(text) as AdversarialRound
+      round.number = roundNum
+      // Preserve the user's original argument
+      round.prosecution.argument = user_input || 'Argumento manual del usuario.'
+      return NextResponse.json({ round })
+    }
+
+    if (action === 'evaluate') {
+      const rounds = body.previous_rounds as AdversarialRound[] | undefined
+
+      const response = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: `Evalúa de forma comprehensiva la siguiente simulación adversarial:
+
+RONDAS:
+${JSON.stringify(rounds ?? [], null, 2)}
+
+Analiza la fortaleza global de ambas posiciones y genera una evaluación completa.
+
+Responde en este formato JSON exacto:
+{
+  "evaluation": {
+    "overall_strength": 7.5,
+    "prosecution_score": 8,
+    "defense_score": 6,
+    "summary": "resumen comprehensivo de la evaluación",
+    "strong_points": ["punto fuerte 1", "punto fuerte 2"],
+    "weak_points": ["punto débil 1", "punto débil 2"],
+    "recommendation": "recomendación estratégica detallada"
+  }
+}`,
+        }],
+      })
+
+      const text = response.content[0].type === 'text' ? response.content[0].text : ''
+      const parsed = parseClaudeJSON(text) as { evaluation: unknown }
+      return NextResponse.json(parsed)
+    }
+
+    return NextResponse.json({ error: 'Acción no reconocida' }, { status: 400 })
+  } catch (error) {
+    console.error('Adversarial API error:', error)
+    const message = error instanceof Error ? error.message : 'Error interno del servidor'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
