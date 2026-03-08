@@ -187,62 +187,10 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
         </div>
       )}
 
-      {/* Main content */}
+      {/* Main content — two equal columns */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Chapter sidebar */}
-        <div className="w-52 shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
-          <div className="p-3 space-y-0.5">
-            <button
-              onClick={() => handleChapterClick(null)}
-              className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                selectedChapter === null && !weakPoints
-                  ? 'bg-green-50 font-semibold text-green-800'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <span>&#128172;</span>
-              <span>Chat Completo</span>
-            </button>
-
-            <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              Capitulos
-            </p>
-
-            {chapters.map(ch => (
-              <button
-                key={ch.chapter}
-                onClick={() => handleChapterClick(ch.chapter)}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                  selectedChapter === ch.chapter
-                    ? 'bg-green-50 font-semibold text-green-800'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <span className="text-xs">{chapterIcons[ch.chapter] || ch.chapter}</span>
-                <span className="flex-1 truncate">{ch.name}</span>
-                <span className="text-[10px] text-gray-400">{ch.count}</span>
-              </button>
-            ))}
-
-            <div className="border-t border-gray-100 my-2" />
-
-            <button
-              onClick={handleWeakPointsClick}
-              className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                weakPoints
-                  ? 'bg-red-50 font-semibold text-red-700'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <span>&#9888;</span>
-              <span className="flex-1">Puntos debiles</span>
-              <span className="text-[10px] text-gray-400">{weakPointsCount}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Chat column */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Chat column — 50% */}
+        <div className="flex w-1/2 flex-col overflow-hidden border-r border-gray-200">
           <ChatView
             caseId={caseData.id}
             chapter={selectedChapter}
@@ -257,12 +205,14 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
           />
         </div>
 
-        {/* Evidence detail panel */}
-        <div className="w-[380px] shrink-0 overflow-hidden border-l border-gray-200 bg-white">
-          <div className="sticky top-0 border-b border-gray-200 bg-white px-5 py-3">
+        {/* Evidence detail panel — 50% */}
+        <div className="flex w-1/2 flex-col overflow-hidden bg-white">
+          <div className="border-b border-gray-200 bg-white px-5 py-3">
             <h2 className="text-sm font-semibold text-gray-800">Detalle de Evidencia</h2>
           </div>
-          <ChatEvidencePanel message={selectedMessage} />
+          <div className="flex-1 overflow-y-auto">
+            <ChatEvidencePanel message={selectedMessage} />
+          </div>
         </div>
       </div>
     </div>
