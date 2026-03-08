@@ -80,7 +80,7 @@ export default function StrategyPage({ caseData }: Props) {
   const [loading, setLoading] = useState(false)
   const [expandedCharge, setExpandedCharge] = useState<string | null>(null)
   const [singleLoading, setSingleLoading] = useState<string | null>(null)
-  const [singleAnalysis, setSingleAnalysis] = useState<Record<string, unknown>>({})
+  const [singleAnalysis, setSingleAnalysis] = useState<Record<string, Record<string, unknown>>>({})
 
   // New charge form
   const [newName, setNewName] = useState('')
@@ -152,7 +152,7 @@ export default function StrategyPage({ caseData }: Props) {
       })
       const data = await res.json()
       if (!data.error) {
-        setSingleAnalysis(prev => ({ ...prev, [charge.id]: data }))
+        setSingleAnalysis(prev => ({ ...prev, [charge.id]: data as Record<string, unknown> }))
         setExpandedCharge(charge.id)
       }
     } catch (err) {
@@ -370,13 +370,13 @@ export default function StrategyPage({ caseData }: Props) {
                       <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <h4 className="text-xs font-semibold text-blue-700 uppercase mb-2">🔍 Análisis Profundo</h4>
                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                          {(singleAnalysis[charge.id] as Record<string, unknown>).detailed_analysis as string}
+                          {String((singleAnalysis[charge.id])?.detailed_analysis || "")}
                         </p>
-                        {((singleAnalysis[charge.id] as Record<string, unknown>).counter_arguments as string[])?.length > 0 && (
+                        {(singleAnalysis[charge.id]?.counter_arguments as string[] | undefined)?.length && (
                           <div className="mt-2">
                             <h5 className="text-xs font-semibold text-orange-600 mb-1">Posibles Contraargumentos:</h5>
                             <ul className="text-sm text-gray-600 space-y-1">
-                              {((singleAnalysis[charge.id] as Record<string, unknown>).counter_arguments as string[]).map((ca: string, i: number) => (
+                              {(singleAnalysis[charge.id]?.counter_arguments as string[]).map((ca: string, i: number) => (
                                 <li key={i}>⚡ {ca}</li>
                               ))}
                             </ul>
