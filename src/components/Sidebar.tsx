@@ -10,7 +10,7 @@ interface Chapter {
   count: number
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}) {
   const pathname = usePathname()
   const [caseName, setCaseName] = useState<string | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
@@ -56,7 +56,7 @@ export default function Sidebar() {
   ]
 
   return (
-    <aside className="no-print flex w-56 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
+    <aside className="no-print flex h-full w-56 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl">&#9878;</span>
