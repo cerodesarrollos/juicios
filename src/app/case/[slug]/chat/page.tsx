@@ -15,28 +15,11 @@ export default async function ChatPageRoute({ params }: { params: { slug: string
   const caseData = cases?.[0] as Case | undefined
   if (!caseData) notFound()
 
-  // Fetch chapter counts for sidebar
-  const { data: chapterCounts } = await supabaseServer
-    .from('chat_evidence')
-    .select('chapter, chapter_name')
-    .eq('case_id', caseData.id)
-
-  const chapters: { chapter: number; name: string; count: number }[] = []
-  if (chapterCounts) {
-    const map = new Map<number, { name: string; count: number }>()
-    for (const row of chapterCounts) {
-      const existing = map.get(row.chapter)
-      if (existing) {
-        existing.count++
-      } else {
-        map.set(row.chapter, { name: row.chapter_name, count: 1 })
-      }
-    }
-    for (const [ch, val] of map) {
-      chapters.push({ chapter: ch, name: val.name, count: val.count })
-    }
-    chapters.sort((a, b) => a.chapter - b.chapter)
-  }
+  // Fetch chapter counts via RPC (avoids 1000 row default limit)
+  const { data: chapterData } = await supabaseServer.rpc('get_chat_chapters', { p_case_id: caseData.id })
+  const chapters: { chapter: number; name: string; count: number }[] = (chapterData || []).map(
+    (r: { chapter: number; name: string; count: number }) => ({ chapter: r.chapter, name: r.name, count: r.count })
+  )
 
   // Weak points count
   const { count: weakCount } = await supabaseServer
