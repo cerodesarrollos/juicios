@@ -95,23 +95,103 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 3. Evidence
+    // 3. Evidence (with PDF parsing and image descriptions)
     const { data: evidence } = await supabaseServer
       .from('evidence')
       .select('*')
       .eq('case_id', case_id)
 
+    let pdfsParsed = 0
+    let pdfsSkipped = 0
+
     for (const e of evidence ?? []) {
-      const content = `[${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`
+      // Base metadata chunk for every evidence record
+      const baseContent = `[${e.evidence_type}] ${e.title}: ${e.description ?? 'Sin descripción'}`
       chunks.push({
         case_id,
         source_table: 'evidence',
         source_id: e.id,
         chapter: null,
-        content,
+        content: baseContent,
         metadata: { type: e.evidence_type, title: e.title },
         embedding: [],
       })
+
+      // PDF parsing: download and extract text
+      const isPdf = e.file_type?.toLowerCase()?.includes('pdf') ||
+        e.file_url?.toLowerCase()?.endsWith('.pdf') ||
+        e.file_path?.toLowerCase()?.endsWith('.pdf')
+
+      if (isPdf && (e.file_url || e.file_path)) {
+        try {
+          let pdfBuffer: ArrayBuffer | null = null
+
+          if (e.file_path) {
+            // Download from Supabase Storage
+            const { data: fileData, error: dlError } = await supabaseServer.storage
+              .from('case-files')
+              .download(e.file_path)
+            if (dlError) throw new Error(`Storage download failed: ${dlError.message}`)
+            if (fileData) pdfBuffer = await fileData.arrayBuffer()
+          } else if (e.file_url) {
+            // Fetch directly from URL
+            const resp = await fetch(e.file_url)
+            if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`)
+            pdfBuffer = await resp.arrayBuffer()
+          }
+
+          if (pdfBuffer) {
+            const { PDFParse } = await import('pdf-parse')
+            const parser = new PDFParse({ data: new Uint8Array(pdfBuffer) })
+            const result = await parser.getText()
+            const pdfText = result.text?.trim()
+            const numPages = result.pages?.length ?? 0
+
+            if (pdfText && pdfText.length > 0) {
+              const pdfChunks = chunkText(pdfText)
+              for (let i = 0; i < pdfChunks.length; i++) {
+                chunks.push({
+                  case_id,
+                  source_table: 'evidence_pdf',
+                  source_id: e.id,
+                  chapter: null,
+                  content: `PDF "${e.title}"${pdfChunks.length > 1 ? ` [parte ${i + 1}/${pdfChunks.length}]` : ''}: ${pdfChunks[i]}`,
+                  metadata: {
+                    title: e.title,
+                    evidence_type: e.evidence_type,
+                    original_filename: e.file_name ?? e.file_path ?? '',
+                    part: i + 1,
+                    total_parts: pdfChunks.length,
+                    total_pages: numPages,
+                  },
+                  embedding: [],
+                })
+              }
+              pdfsParsed++
+              console.log(`PDF parsed: "${e.title}" — ${numPages} pages, ${pdfChunks.length} chunks`)
+            }
+            await parser.destroy()
+          }
+        } catch (pdfError) {
+          pdfsSkipped++
+          console.error(`PDF parse failed for evidence "${e.title}" (${e.id}):`, pdfError)
+          // Continue processing other evidence — don't crash
+        }
+      }
+
+      // Image evidence: use description as content if substantial
+      const isImage = e.file_type?.toLowerCase()?.match(/image|foto|photo|screenshot|captura|jpg|jpeg|png/)
+      if (isImage && e.description && e.description.length > 50) {
+        chunks.push({
+          case_id,
+          source_table: 'evidence_image',
+          source_id: e.id,
+          chapter: null,
+          content: `Imagen "${e.title}": ${e.description}`,
+          metadata: { title: e.title, evidence_type: e.evidence_type },
+          embedding: [],
+        })
+      }
     }
 
     // 4. Timeline events
@@ -184,7 +264,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ count: chunks.length, message: `${chunks.length} fragmentos de evidencia procesados.` })
+    return NextResponse.json({
+      count: chunks.length,
+      pdfs_parsed: pdfsParsed,
+      pdfs_skipped: pdfsSkipped,
+      message: `${chunks.length} fragmentos de evidencia procesados. PDFs parseados: ${pdfsParsed}, PDFs omitidos: ${pdfsSkipped}.`,
+    })
   } catch (error) {
     console.error('Embed evidence error:', error)
     const message = error instanceof Error ? error.message : 'Error interno'
