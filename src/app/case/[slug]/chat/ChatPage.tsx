@@ -37,6 +37,8 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
   const [jumpToId, setJumpToId] = useState('')
   const [jumpInput, setJumpInput] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [mobileEvidence, setMobileEvidence] = useState(false)
   const [mobileSearch, setMobileSearch] = useState(false)
 
@@ -60,6 +62,8 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
   const handleChapterClick = (ch: number | null) => {
     setSelectedChapter(ch)
     setWeakPoints(false)
+    setDateFrom('')
+    setDateTo('')
   }
 
   const handleWeakPointsClick = () => {
@@ -77,7 +81,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
     setWeakPoints(false)
   }
 
-  const hasFilters = selectedChapter !== null || search || sender || messageType || keyEvidence || weakPoints
+  const hasFilters = selectedChapter !== null || search || sender || messageType || keyEvidence || weakPoints || dateFrom || dateTo
 
   return (
     <div className="flex h-full flex-col">
@@ -221,6 +225,24 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
             />
             Punto debil
           </label>
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs text-gray-600">Desde:</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={e => setDateFrom(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs text-gray-600">Hasta:</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={e => setDateTo(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+            />
+          </div>
         </div>
       )}
 
@@ -236,6 +258,8 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
             messageType={messageType}
             keyEvidence={keyEvidence}
             weakPoints={weakPoints}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
             selectedId={selectedMessage?.id ?? null}
             onSelect={handleSelectMessage}
             jumpToId={jumpToId}

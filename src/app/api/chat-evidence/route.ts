@@ -13,6 +13,8 @@ export async function GET(req: NextRequest) {
   const messageType = req.nextUrl.searchParams.get('message_type')
   const keyEvidence = req.nextUrl.searchParams.get('key_evidence')
   const weakPoints = req.nextUrl.searchParams.get('weak_points')
+  const dateFrom = req.nextUrl.searchParams.get('date_from')
+  const dateTo = req.nextUrl.searchParams.get('date_to')
   const offset = parseInt(req.nextUrl.searchParams.get('offset') || '0', 10)
   const limit = parseInt(req.nextUrl.searchParams.get('limit') || '100', 10)
 
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest) {
   if (keyEvidence === 'true') query = query.eq('is_key_evidence', true)
   if (weakPoints === 'true') query = query.eq('is_weak_point', true)
   if (search) query = query.or(`message_text.ilike.%${search}%,transcription.ilike.%${search}%`)
+  if (dateFrom) query = query.gte('message_date', `${dateFrom}T00:00:00`)
+  if (dateTo) query = query.lte('message_date', `${dateTo}T23:59:59`)
 
   query = query.range(offset, offset + limit - 1)
 

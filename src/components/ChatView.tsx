@@ -18,6 +18,8 @@ interface ChatViewProps {
   messageType: string
   keyEvidence: boolean
   weakPoints: boolean
+  dateFrom: string
+  dateTo: string
   selectedId: string | null
   onSelect: (msg: ChatEvidence) => void
   jumpToId: string
@@ -325,6 +327,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
 export default function ChatView({
   caseId, chapter, search, sender, messageType, keyEvidence, weakPoints,
   selectedId, onSelect, jumpToId, showActions, chapters: chaptersList,
+  dateFrom, dateTo,
 }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatEvidence[]>([])
   const [total, setTotal] = useState(0)
@@ -345,6 +348,8 @@ export default function ChatView({
     if (messageType) params.set('message_type', messageType)
     if (keyEvidence) params.set('key_evidence', 'true')
     if (weakPoints) params.set('weak_points', 'true')
+    if (dateFrom) params.set('date_from', dateFrom)
+    if (dateTo) params.set('date_to', dateTo)
 
     const res = await fetch(`/api/chat-evidence?${params}`)
     const json = await res.json()
@@ -361,7 +366,7 @@ export default function ChatView({
     }
     setHasMore(newMsgs.length === 100)
     setLoading(false)
-  }, [caseId, chapter, search, sender, messageType, keyEvidence, weakPoints, loading])
+  }, [caseId, chapter, search, sender, messageType, keyEvidence, weakPoints, dateFrom, dateTo, loading])
 
   // Reset when filters change
   useEffect(() => {
@@ -370,7 +375,7 @@ export default function ChatView({
     setHasMore(true)
     fetchMessages(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caseId, chapter, search, sender, messageType, keyEvidence, weakPoints])
+  }, [caseId, chapter, search, sender, messageType, keyEvidence, weakPoints, dateFrom, dateTo])
 
   // Infinite scroll observer
   useEffect(() => {
