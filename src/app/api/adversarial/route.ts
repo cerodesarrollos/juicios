@@ -90,6 +90,17 @@ function buildFallbackSystemPrompt(caseData: Record<string, unknown>, evidence: 
     .join('\n')
 
   return `Eres un experto analista legal argentino. Tu trabajo es generar simulaciones adversariales de alta calidad para casos legales.
+PARTES DEL CASO:
+- DEMANDANTE/ACUSACIÓN: ${caseData.plaintiff_name} (quien inicia la demanda)
+- DEMANDADO/DEFENSA: ${caseData.defendant_name} (quien debe responder)
+
+REGLA CRÍTICA DE ATRIBUCIÓN:
+- Cada mensaje tiene un EMISOR (sender). Prestá MÁXIMA atención a QUIÉN dice cada cosa.
+- Si ${caseData.plaintiff_name} dice "no me das información" → es el DEMANDANTE reclamando al demandado
+- Si ${caseData.defendant_name} dice "no me das información" → es el DEMANDADO reclamando al demandante  
+- NUNCA confundir quién dijo qué. El sender al inicio de cada mensaje indica quién habla.
+- Los mensajes tienen formato: "NOMBRE (fecha): texto"
+
 
 CASO: ${caseData.title ?? 'Sin título'}
 DESCRIPCIÓN: ${caseData.description ?? 'Sin descripción'}
@@ -122,6 +133,17 @@ REGLAS:
 
 function buildRAGSystemPrompt(caseData: Record<string, unknown>, relevantEvidence: string) {
   return `Eres un experto analista legal argentino. Tu trabajo es generar simulaciones adversariales de alta calidad para casos legales.
+PARTES DEL CASO:
+- DEMANDANTE/ACUSACIÓN: ${caseData.plaintiff_name} (quien inicia la demanda)
+- DEMANDADO/DEFENSA: ${caseData.defendant_name} (quien debe responder)
+
+REGLA CRÍTICA DE ATRIBUCIÓN:
+- Cada mensaje tiene un EMISOR (sender). Prestá MÁXIMA atención a QUIÉN dice cada cosa.
+- Si ${caseData.plaintiff_name} dice "no me das información" → es el DEMANDANTE reclamando al demandado
+- Si ${caseData.defendant_name} dice "no me das información" → es el DEMANDADO reclamando al demandante  
+- NUNCA confundir quién dijo qué. El sender al inicio de cada mensaje indica quién habla.
+- Los mensajes tienen formato: "NOMBRE (fecha): texto"
+
 
 CASO: ${caseData.title ?? 'Sin título'}
 DESCRIPCIÓN: ${caseData.description ?? 'Sin descripción'}
