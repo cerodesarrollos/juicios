@@ -18,8 +18,27 @@ async function fetchCaseContext(caseId: string) {
   } catch { /* table may not exist */ }
 
   try {
-    const chatEvidenceResult = await supabaseServer.from('chat_evidence').select('*').eq('case_id', caseId).order('sort_order')
-    chatEvidence = chatEvidenceResult.data ?? []
+    // First get ALL key evidence and weak points (these are most important)
+    const keyResult = await supabaseServer
+      .from('chat_evidence')
+      .select('*')
+      .eq('case_id', caseId)
+      .or('is_key_evidence.eq.true,is_weak_point.eq.true')
+      .order('chapter,sort_order')
+      .limit(500)
+    
+    // Then get a sample from EACH chapter to ensure coverage
+    const allChaptersResult = await supabaseServer
+      .from('chat_evidence')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('chapter,sort_order')
+      .range(0, 4999)
+    
+    // Merge: key evidence first, then fill with chapter samples
+    const keyIds = new Set((keyResult.data ?? []).map((r: Record<string, unknown>) => r.id))
+    const remaining = (allChaptersResult.data ?? []).filter((r: Record<string, unknown>) => !keyIds.has(r.id))
+    chatEvidence = [...(keyResult.data ?? []), ...remaining]
   } catch { /* table may not exist */ }
 
   return {
