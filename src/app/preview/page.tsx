@@ -125,11 +125,11 @@ export default function PreviewPage() {
                             </div>
 
                             <div className="flex gap-3">
-                                <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] bg-white text-[#0c0c0f] font-bold text-[13px] transition-all duration-200 hover:shadow-[0_0_24px_rgba(255,255,255,0.08)]">
+                                <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] bg-[#1e1e22] text-white/80 font-bold text-[13px] border border-white/[0.08] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.04)] transition-all duration-150 hover:bg-[#222226] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
                                     <IconScale className="w-4 h-4 mr-2 opacity-50" />
                                     Ir a Estrategia
                                 </button>
-                                <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] border border-white/[0.1] text-white/50 font-semibold text-[13px] transition-all duration-200 hover:bg-white/[0.04] hover:border-white/[0.15] hover:text-white/65">
+                                <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] bg-[#1a1a1e] text-white/45 font-semibold text-[13px] border border-white/[0.06] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.03)] transition-all duration-150 hover:bg-[#1e1e22] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
                                     <IconTarget className="w-4 h-4 mr-2 opacity-40" />
                                     Iniciar Simulacion
                                 </button>
@@ -175,7 +175,7 @@ export default function PreviewPage() {
                                         </p>
                                     </div>
                                 </div>
-                                <button className="w-full px-4 py-3 rounded-[14px] bg-white/[0.05] border border-white/[0.07] text-white/55 text-[13px] font-semibold transition-all duration-200 hover:bg-white/[0.08] hover:border-white/[0.12] hover:text-white/70">
+                                <button className="w-full px-4 py-3 rounded-[14px] bg-[#1a1a1e] border border-white/[0.06] text-white/55 text-[13px] font-semibold shadow-[inset_0_2px_4px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.03)] transition-all duration-150 hover:bg-[#1e1e22] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
                                     Corregir Oficios
                                 </button>
                             </div>
