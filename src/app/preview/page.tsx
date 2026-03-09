@@ -1,19 +1,123 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
-function Scale({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 3v18m-9-6l3-9h12l3 9M3 15h6m6 0h6"/></svg> }
-function Target({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> }
-function DollarSign({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v20m5-17H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7"/></svg> }
-function Folder({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg> }
-function MessageSquare({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> }
-function Calendar({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> }
+/* ── SVG Icons (stroke-based, monochrome) ── */
+function IconCloud({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M24 32V20m0 0l-5 5m5-5l5 5" />
+            <path d="M16 36h16a10 10 0 001-19.95A12 12 0 109 24a10 10 0 007 12z" />
+        </svg>
+    );
+}
+
+function IconScale({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M24 6v36M6 18l6-12h24l6 12M6 18h12M30 18h12" />
+            <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" />
+            <circle cx="36" cy="18" r="1" fill="currentColor" stroke="none" />
+        </svg>
+    );
+}
+
+function IconFolder({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 14v20a4 4 0 004 4h28a4 4 0 004-4V18a4 4 0 00-4-4H24l-4-4H10a4 4 0 00-4 4z" />
+        </svg>
+    );
+}
+
+function IconChat({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M42 30a4 4 0 01-4 4H14l-8 8V10a4 4 0 014-4h28a4 4 0 014 4z" />
+        </svg>
+    );
+}
+
+function IconDollar({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M24 4v40m10-34H19a7 7 0 000 14h10a7 7 0 010 14H14" />
+        </svg>
+    );
+}
+
+function IconTarget({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="24" cy="24" r="20" />
+            <circle cx="24" cy="24" r="12" />
+            <circle cx="24" cy="24" r="4" />
+        </svg>
+    );
+}
+
+function IconCalendar({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="6" y="8" width="36" height="36" rx="4" />
+            <path d="M32 4v8M16 4v8M6 20h36" />
+        </svg>
+    );
+}
+
+function IconAlert({ className = "" }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M24 18v8m0 6h.02" />
+            <path d="M21.17 6.98L3.87 36a3 3 0 002.63 4.5h34.5a3 3 0 002.63-4.5L26.83 6.98a3 3 0 00-5.66 0z" />
+        </svg>
+    );
+}
+
+/* ── Components ── */
+
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+    return (
+        <div className={`rounded-2xl border border-white/[0.08] bg-[#161618] ${className}`}>
+            {children}
+        </div>
+    );
+}
+
+function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+    return (
+        <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-medium text-white/30 uppercase tracking-widest">{label}</span>
+                <div className="text-white/20">{icon}</div>
+            </div>
+            <p className="text-[28px] font-semibold text-white/90 leading-none">{value}</p>
+        </Card>
+    );
+}
+
+function ActivityItem({ icon, title, desc, time }: { icon: React.ReactNode; title: string; desc: string; time: string }) {
+    return (
+        <div className="flex gap-4 py-4 border-b border-white/[0.04] last:border-b-0">
+            <div className="mt-0.5 p-2.5 rounded-xl bg-white/[0.04] shrink-0 text-white/30">
+                {icon}
+            </div>
+            <div className="min-w-0">
+                <p className="text-[13px] font-medium text-white/80">{title}</p>
+                <p className="text-[13px] text-white/30 mt-0.5">{desc}</p>
+                <p className="text-[11px] text-white/15 mt-1.5">{time}</p>
+            </div>
+        </div>
+    );
+}
+
+/* ── Page ── */
 
 const currentCase = {
     title: "Toro, Franco Chaves s/ Estafa y Defraudacion",
     status: "En investigacion",
-    plaintiff: { name: "Matias Rodriguez" },
-    defendant: { name: "Franco Chaves (Toro)" },
+    plaintiff: "Matias Rodriguez",
+    defendant: "Franco Chaves (Toro)",
     totalDebt: 45000,
     totalPaid: 15000,
     evidenceCount: 124,
@@ -22,119 +126,115 @@ const currentCase = {
     caseType: "Penal Económico",
 };
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-    return (
-        <div className={`rounded-2xl border border-[#2a2a35] bg-[#141420] ${className}`}>
-            {children}
-        </div>
-    );
-}
-
-function Badge({ children, color = "blue" }: { children: React.ReactNode; color?: string }) {
-    const colors: Record<string, string> = {
-        blue: "bg-blue-500/20 text-blue-400",
-        gray: "bg-white/[0.06] text-white/60",
-    };
-    return (
-        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${colors[color] || colors.blue}`}>
-            {children}
-        </span>
-    );
-}
-
 export default function PreviewPage() {
-    const fmt = (n: number) => `US$ ${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 }).format(n)}`;
+    const fmt = (n: number) => `US$ ${n.toLocaleString("es-AR")}`;
 
     return (
-        <div className="min-h-screen bg-[#0c0c14] text-[#e8e8ef] p-6">
-            <div className="max-w-6xl mx-auto space-y-6">
-                {/* Hero */}
-                <Card className="p-8 relative overflow-hidden">
-                    <div className="absolute top-4 right-6 opacity-[0.04]">
-                        <Scale className="w-40 h-40" />
+        <div className="min-h-screen bg-[#0e0e10] text-white antialiased">
+            <div className="max-w-[1100px] mx-auto px-6 py-8 space-y-5">
+
+                {/* ── Hero ── */}
+                <Card className="p-7 relative overflow-hidden">
+                    <div className="absolute -top-4 -right-4 opacity-[0.03]">
+                        <IconScale className="w-44 h-44" />
                     </div>
                     <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-4">
-                            <Badge color="blue">{currentCase.status}</Badge>
-                            <Badge color="gray">{currentCase.caseType}</Badge>
-                            <span className="text-sm text-white/35">{currentCase.dateRange}</span>
+                        <div className="flex items-center gap-2.5 mb-4">
+                            <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium bg-white/[0.06] text-white/50">
+                                {currentCase.status}
+                            </span>
+                            <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium bg-white/[0.04] text-white/30">
+                                {currentCase.caseType}
+                            </span>
+                            <span className="text-[12px] text-white/20 ml-1">{currentCase.dateRange}</span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{currentCase.title}</h1>
-                        <div className="flex items-center gap-6 text-sm text-white/50 mb-6">
-                            <p><strong className="text-white/70">Actor:</strong> {currentCase.plaintiff.name}</p>
-                            <p><strong className="text-white/70">Demandado:</strong> {currentCase.defendant.name}</p>
+
+                        <h1 className="text-[26px] font-bold text-white/95 tracking-tight mb-3">
+                            {currentCase.title}
+                        </h1>
+
+                        <div className="flex items-center gap-8 text-[13px] text-white/35 mb-7">
+                            <span><span className="text-white/55">Actor:</span> {currentCase.plaintiff}</span>
+                            <span><span className="text-white/55">Demandado:</span> {currentCase.defendant}</span>
                         </div>
+
                         <div className="flex gap-3">
-                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition-colors">
-                                <Scale className="w-4 h-4 mr-2" />
+                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white/90 text-[#0e0e10] font-semibold text-[13px] hover:bg-white transition-colors">
+                                <IconScale className="w-4 h-4 mr-2" />
                                 Ir a Estrategia
                             </button>
-                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl border border-[#2a2a35] text-white/70 font-medium text-sm hover:bg-white/[0.05] transition-colors">
-                                <Target className="w-4 h-4 mr-2" />
-                                Iniciar Simulación
+                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl border border-white/[0.1] text-white/50 font-medium text-[13px] hover:bg-white/[0.04] transition-colors">
+                                <IconTarget className="w-4 h-4 mr-2" />
+                                Iniciar Simulacion
                             </button>
                         </div>
                     </div>
                 </Card>
 
-                {/* Stats */}
+                {/* ── Stats ── */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                        { label: "TOTAL DEUDA", value: fmt(currentCase.totalDebt), Icon: DollarSign, border: "border-t-red-500", text: "text-red-400", icon: "text-red-400/40" },
-                        { label: "TOTAL PAGADO", value: fmt(currentCase.totalPaid), Icon: DollarSign, border: "border-t-green-500", text: "text-green-400", icon: "text-green-400/40" },
-                        { label: "EVIDENCIA", value: "124", Icon: Folder, border: "border-t-blue-500", text: "text-white", icon: "text-blue-400/40" },
-                        { label: "TRANSCRIPCIONES", value: "12", Icon: MessageSquare, border: "border-t-purple-500", text: "text-white", icon: "text-purple-400/40" },
-                    ].map((s, i) => (
-                        <Card key={i} className={`p-5 border-t-2 ${s.border}`}>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider">{s.label}</h3>
-                                <s.Icon className={`w-4 h-4 ${s.icon}`} />
-                            </div>
-                            <p className={`text-2xl font-bold ${s.text}`}>{s.value}</p>
-                        </Card>
-                    ))}
+                    <StatCard label="Total Deuda" value={fmt(currentCase.totalDebt)} icon={<IconDollar className="w-4 h-4" />} />
+                    <StatCard label="Total Pagado" value={fmt(currentCase.totalPaid)} icon={<IconDollar className="w-4 h-4" />} />
+                    <StatCard label="Evidencia" value="124" icon={<IconFolder className="w-4 h-4" />} />
+                    <StatCard label="Transcripciones" value="12" icon={<IconChat className="w-4 h-4" />} />
                 </div>
 
-                {/* Activity + Embargos */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div className="lg:col-span-3 space-y-4">
-                        <h2 className="text-lg font-bold text-white">Actividad Reciente</h2>
-                        <Card className="p-6">
-                            <div className="space-y-6">
-                                {[
-                                    { Icon: Folder, bg: "bg-blue-500/10", ic: "text-blue-400", title: "Nuevos PDF procesados", desc: "Se ingresaron 14 PDFs sobre estado de cuenta bancaria", time: "Hace 2 horas" },
-                                    { Icon: Scale, bg: "bg-purple-500/10", ic: "text-purple-400", title: "Actualización de estrategia", desc: "El cargo de 'Usura' fue actualizado con nueva evidencia", time: "Ayer" },
-                                    { Icon: MessageSquare, bg: "bg-green-500/10", ic: "text-green-400", title: "Transcripción completada", desc: "Audio WhatsApp #14 procesado exitosamente", time: "Hace 2 días" },
-                                    { Icon: Calendar, bg: "bg-white/[0.05]", ic: "text-white/40", title: "Cambio de estado", desc: "El caso pasó a Fase de Ejecución", time: "Hace 3 días" },
-                                ].map((item, i) => (
-                                    <div key={i} className="flex gap-4">
-                                        <div className={`mt-0.5 p-2.5 rounded-xl shrink-0 ${item.bg}`}>
-                                            <item.Icon className={`w-5 h-5 ${item.ic}`} />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-white/85">{item.title}</p>
-                                            <p className="text-sm text-white/40 mt-0.5">{item.desc}</p>
-                                            <p className="text-xs text-white/25 mt-2">{item.time}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                {/* ── Content Grid ── */}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+
+                    {/* Activity */}
+                    <div className="lg:col-span-3 space-y-3">
+                        <h2 className="text-[15px] font-semibold text-white/70 pl-1">Actividad Reciente</h2>
+                        <Card className="px-6 py-2">
+                            <ActivityItem
+                                icon={<IconFolder className="w-[18px] h-[18px]" />}
+                                title="Nuevos PDF procesados"
+                                desc="Se ingresaron 14 PDFs sobre estado de cuenta bancaria"
+                                time="Hace 2 horas"
+                            />
+                            <ActivityItem
+                                icon={<IconScale className="w-[18px] h-[18px]" />}
+                                title="Actualizacion de estrategia"
+                                desc="El cargo de 'Usura' fue actualizado con nueva evidencia"
+                                time="Ayer"
+                            />
+                            <ActivityItem
+                                icon={<IconChat className="w-[18px] h-[18px]" />}
+                                title="Transcripcion completada"
+                                desc="Audio WhatsApp #14 procesado exitosamente"
+                                time="Hace 2 dias"
+                            />
+                            <ActivityItem
+                                icon={<IconCalendar className="w-[18px] h-[18px]" />}
+                                title="Cambio de estado"
+                                desc="El caso paso a Fase de Ejecucion"
+                                time="Hace 3 dias"
+                            />
                         </Card>
                     </div>
 
-                    <div className="lg:col-span-2 space-y-4">
-                        <h2 className="text-lg font-bold text-white">Estado de Embargos</h2>
-                        <Card className="p-6 border-l-2 border-l-yellow-500/60">
-                            <h3 className="font-bold text-yellow-400 mb-2">Acción Requerida</h3>
-                            <p className="text-sm text-white/45 mb-6 leading-relaxed">
-                                Tenés 2 cuentas bancarias pendientes de embargo y no fueron localizadas por el sistema oficial.
-                            </p>
-                            <button className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-[#2a2a35] text-white/80 text-sm font-medium hover:bg-white/[0.08] transition-colors">
+                    {/* Embargos */}
+                    <div className="lg:col-span-2 space-y-3">
+                        <h2 className="text-[15px] font-semibold text-white/70 pl-1">Estado de Embargos</h2>
+                        <Card className="p-6">
+                            <div className="flex items-start gap-3 mb-4">
+                                <div className="p-2 rounded-xl bg-white/[0.04] shrink-0 text-white/30">
+                                    <IconAlert className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-[14px] font-semibold text-white/80">Accion Requerida</h3>
+                                    <p className="text-[13px] text-white/30 mt-1.5 leading-relaxed">
+                                        Tenes 2 cuentas bancarias pendientes de embargo y no fueron localizadas por el sistema oficial.
+                                    </p>
+                                </div>
+                            </div>
+                            <button className="w-full mt-2 px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 text-[13px] font-medium hover:bg-white/[0.08] transition-colors">
                                 Corregir Oficios
                             </button>
                         </Card>
                     </div>
                 </div>
+
             </div>
         </div>
     );
