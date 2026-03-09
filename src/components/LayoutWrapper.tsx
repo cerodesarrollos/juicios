@@ -8,7 +8,12 @@ import Sidebar from './Sidebar'
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isShared = pathname.startsWith('/shared')
+  const isLogin = pathname.startsWith('/login')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  if (isLogin) {
+    return <>{children}</>
+  }
 
   if (isShared) {
     return (
