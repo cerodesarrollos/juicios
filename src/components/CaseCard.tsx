@@ -13,47 +13,41 @@ export default function CaseCard({ summary }: { summary: CaseSummary }) {
     ? Math.round((summary.evidence_complete / (summary.total_transactions * 4)) * 100)
     : 0
 
-  const statusColors: Record<string, string> = {
-    activo: 'bg-green-100 text-green-700',
-    cerrado: 'bg-gray-100 text-gray-600',
-    archivado: 'bg-yellow-100 text-yellow-700',
-    ganado: 'bg-blue-100 text-blue-700',
-    perdido: 'bg-red-100 text-red-700',
-  }
-
   return (
     <Link
       href={`/case/${summary.slug}`}
-      className="block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-green-300 hover:shadow-md"
+      className="block rounded-[20px] p-px bg-gradient-to-b from-[#2a2a2e] to-[#1a1a1d] transition-all hover:from-[#333338] hover:to-[#222225]"
     >
-      <div className="flex items-start justify-between">
-        <h3 className="text-base font-semibold text-gray-900 truncate">{summary.title}</h3>
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[summary.status] ?? 'bg-gray-100 text-gray-600'}`}>
-          {summary.status}
-        </span>
-      </div>
-
-      <p className="mt-1 text-sm text-gray-500">
-        {summary.plaintiff_name} vs {summary.defendant_name}
-      </p>
-
-      <div className="mt-4 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Deuda total</span>
-          <span className="font-bold text-gray-900">{formatUSD(summary.total_debt_usd)}</span>
+      <div className="rounded-[19px] bg-[#161619] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_32px_-8px_rgba(0,0,0,0.6)]">
+        <div className="flex items-start justify-between">
+          <h3 className="text-[14px] font-semibold text-white/85 truncate">{summary.title}</h3>
+          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-white/[0.07] text-white/55 border border-white/[0.08]">
+            {summary.status}
+          </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-gray-200">
-          <div className="h-full rounded-full bg-green-600 transition-all" style={{ width: `${paidPct}%` }} />
-        </div>
-        <div className="flex justify-between text-xs text-gray-400">
-          <span>{paidPct}% cobrado</span>
-          <span>{formatUSD(summary.pending_usd)} pendiente</span>
-        </div>
-      </div>
 
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-        <span>{summary.total_transactions} transacciones</span>
-        <span>Evidencia: {evidencePct}%</span>
+        <p className="mt-1.5 text-[13px] text-white/30">
+          {summary.plaintiff_name} vs {summary.defendant_name}
+        </p>
+
+        <div className="mt-5 space-y-3">
+          <div className="flex justify-between text-[13px]">
+            <span className="text-white/25">Deuda total</span>
+            <span className="font-semibold text-white/80">{formatUSD(summary.total_debt_usd)}</span>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="h-full rounded-full bg-white/20 transition-all" style={{ width: `${paidPct}%` }} />
+          </div>
+          <div className="flex justify-between text-[11px] text-white/20">
+            <span>{paidPct}% cobrado</span>
+            <span>{formatUSD(summary.pending_usd)} pendiente</span>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between text-[11px] text-white/20">
+          <span>{summary.total_transactions} transacciones</span>
+          <span>Evidencia: {evidencePct}%</span>
+        </div>
       </div>
     </Link>
   )

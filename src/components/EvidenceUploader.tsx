@@ -28,9 +28,7 @@ export default function EvidenceUploader({ caseSlug, caseId, proofId, slot, tran
       formData.append('transaction_id', transactionId)
 
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
-      if (res.ok) {
-        onUploaded()
-      }
+      if (res.ok) onUploaded()
     } finally {
       setUploading(false)
     }
@@ -54,19 +52,17 @@ export default function EvidenceUploader({ caseSlug, caseId, proofId, slot, tran
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`cursor-pointer rounded-xl border-2 border-dashed p-3 text-center transition-colors ${
+      className={`cursor-pointer rounded-[14px] border-2 border-dashed p-3 text-center transition-colors ${
         dragOver
-          ? 'border-green-500 bg-green-50'
-          : 'border-gray-200 bg-gray-50 hover:border-green-300 hover:bg-green-50/50'
+          ? 'border-white/20 bg-white/[0.04]'
+          : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]'
       }`}
     >
       <input ref={inputRef} type="file" className="hidden" onChange={handleFileSelect} />
       {uploading ? (
-        <p className="text-xs text-gray-500">Subiendo...</p>
+        <p className="text-[11px] text-white/30">Subiendo...</p>
       ) : (
-        <p className="text-xs text-gray-400">
-          Arrastra o click para subir
-        </p>
+        <p className="text-[11px] text-white/20">Arrastra o click para subir</p>
       )}
     </div>
   )

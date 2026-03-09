@@ -82,7 +82,7 @@ export default function PDFExport({ caseData, transactions, evidence }: Props) {
   return (
     <button
       onClick={handleExport}
-      className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+      className="rounded-[12px] border border-white/[0.08] bg-[#1a1a1e] px-4 py-2 text-[13px] font-medium text-white/50 hover:bg-[#1e1e22] transition-colors"
     >
       Exportar PDF
     </button>

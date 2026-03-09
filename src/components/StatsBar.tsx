@@ -1,5 +1,16 @@
 import { CaseSummary } from '@/lib/types'
 import { formatUSD } from '@/lib/utils'
+import { CurrencyDollar, FolderOpen } from '@phosphor-icons/react'
+
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[20px] p-px bg-gradient-to-b from-[#2a2a2e] to-[#1a1a1d]">
+      <div className="rounded-[19px] bg-[#161619] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_32px_-8px_rgba(0,0,0,0.6)]">
+        {children}
+      </div>
+    </div>
+  )
+}
 
 export default function StatsBar({ summary }: { summary: CaseSummary }) {
   const completionPct = summary.total_transactions > 0
@@ -8,29 +19,43 @@ export default function StatsBar({ summary }: { summary: CaseSummary }) {
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {/* First card: dark green gradient */}
-      <div className="rounded-2xl bg-gradient-to-br from-green-800 to-green-900 p-5 text-white shadow-sm">
-        <p className="text-sm font-medium text-green-200">Deuda Total</p>
-        <p className="mt-1 text-4xl font-bold">{formatUSD(summary.total_debt_usd)}</p>
-      </div>
-      <StatCard label="Pagado" value={formatUSD(summary.total_paid_usd)} color="text-green-600" />
-      <StatCard label="Pendiente" value={formatUSD(summary.pending_usd)} color="text-yellow-600" />
-      <StatCard
-        label="Evidencia"
-        value={`${summary.evidence_complete}/${summary.total_transactions * 4}`}
-        sub={`${completionPct}% completo`}
-        color="text-blue-600"
-      />
-    </div>
-  )
-}
-
-function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color: string }) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`mt-1 text-4xl font-bold ${color}`}>{value}</p>
-      {sub && <p className="mt-0.5 text-sm text-gray-500">{sub}</p>}
+      <Card>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-normal text-white/25 uppercase tracking-[0.14em]">Deuda Total</span>
+            <CurrencyDollar size={18} weight="thin" className="text-white/15" />
+          </div>
+          <p className="text-[28px] font-medium text-white/90 leading-none tracking-tight">{formatUSD(summary.total_debt_usd)}</p>
+        </div>
+      </Card>
+      <Card>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-normal text-white/25 uppercase tracking-[0.14em]">Pagado</span>
+            <CurrencyDollar size={18} weight="thin" className="text-white/15" />
+          </div>
+          <p className="text-[28px] font-medium text-white/90 leading-none tracking-tight">{formatUSD(summary.total_paid_usd)}</p>
+        </div>
+      </Card>
+      <Card>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-normal text-white/25 uppercase tracking-[0.14em]">Pendiente</span>
+            <CurrencyDollar size={18} weight="thin" className="text-white/15" />
+          </div>
+          <p className="text-[28px] font-medium text-white/90 leading-none tracking-tight">{formatUSD(summary.pending_usd)}</p>
+        </div>
+      </Card>
+      <Card>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-normal text-white/25 uppercase tracking-[0.14em]">Evidencia</span>
+            <FolderOpen size={18} weight="thin" className="text-white/15" />
+          </div>
+          <p className="text-[28px] font-medium text-white/90 leading-none tracking-tight">{summary.evidence_complete}/{summary.total_transactions * 4}</p>
+          <p className="mt-1 text-[12px] text-white/25">{completionPct}% completo</p>
+        </div>
+      </Card>
     </div>
   )
 }
