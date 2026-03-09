@@ -2,7 +2,6 @@
 
 import React from "react";
 
-// Simple icon components
 function Scale({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 3v18m-9-6l3-9h12l3 9M3 15h6m6 0h6"/></svg> }
 function Target({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> }
 function DollarSign({ className = "" }: { className?: string }) { return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v20m5-17H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7"/></svg> }
@@ -23,150 +22,120 @@ const currentCase = {
     caseType: "Penal Económico",
 };
 
-function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
     return (
-        <div className={`relative rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl transition-all duration-300 hover:border-white/[0.15] hover:shadow-[0_0_20px_rgba(6,182,212,0.08)] ${className}`}>
+        <div className={`rounded-2xl border border-[#2a2a35] bg-[#141420] ${className}`}>
             {children}
         </div>
     );
 }
 
-function GlassBadge({ children, color = "cyan" }: { children: React.ReactNode; color?: string }) {
+function Badge({ children, color = "blue" }: { children: React.ReactNode; color?: string }) {
     const colors: Record<string, string> = {
-        cyan: "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
-        purple: "bg-purple-500/15 text-purple-400 border-purple-500/20",
-        green: "bg-green-500/15 text-green-400 border-green-500/20",
-        red: "bg-red-500/15 text-red-400 border-red-500/20",
-        blue: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-        yellow: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-        white: "bg-white/[0.06] text-white/60 border-white/10",
+        blue: "bg-blue-500/20 text-blue-400",
+        gray: "bg-white/[0.06] text-white/60",
     };
     return (
-        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border ${colors[color] || colors.cyan}`}>
+        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${colors[color] || colors.blue}`}>
             {children}
         </span>
     );
 }
 
 export default function PreviewPage() {
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(amount);
-    };
+    const fmt = (n: number) => `US$ ${new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 }).format(n)}`;
 
     return (
-        <div className="relative min-h-screen bg-[#0a0a0f] text-[#f0f0f0]">
-            {/* Aurora */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-[600px] h-[600px] rounded-full top-[-200px] left-[-100px] blur-[120px] opacity-30" style={{ background: 'radial-gradient(circle, #06b6d4, transparent 70%)', animation: 'float 12s ease-in-out infinite' }} />
-                <div className="absolute w-[500px] h-[500px] rounded-full bottom-[-150px] right-[-100px] blur-[120px] opacity-30" style={{ background: 'radial-gradient(circle, #a855f7, transparent 70%)', animation: 'float 12s ease-in-out infinite -4s' }} />
-                <div className="absolute w-[400px] h-[400px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-[120px] opacity-15" style={{ background: 'radial-gradient(circle, #ec4899, transparent 70%)', animation: 'float 12s ease-in-out infinite -8s' }} />
-            </div>
-
-            {/* Grid */}
-            <div className="fixed inset-0 pointer-events-none" style={{
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-                backgroundSize: '60px 60px'
-            }} />
-
-            <div className="relative z-10 p-6 max-w-6xl mx-auto space-y-6">
+        <div className="min-h-screen bg-[#0c0c14] text-[#e8e8ef] p-6">
+            <div className="max-w-6xl mx-auto space-y-6">
                 {/* Hero */}
-                <GlassCard className="p-8 border-l-[3px] border-l-blue-500/50">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                        <Scale className="w-48 h-48" />
+                <Card className="p-8 relative overflow-hidden">
+                    <div className="absolute top-4 right-6 opacity-[0.04]">
+                        <Scale className="w-40 h-40" />
                     </div>
-                    <div className="relative z-10 w-full md:w-2/3">
-                        <div className="flex items-center space-x-3 mb-4">
-                            <GlassBadge color="blue">{currentCase.status}</GlassBadge>
-                            <GlassBadge color="white">{currentCase.caseType}</GlassBadge>
-                            <span className="text-sm text-white/40">{currentCase.dateRange}</span>
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Badge color="blue">{currentCase.status}</Badge>
+                            <Badge color="gray">{currentCase.caseType}</Badge>
+                            <span className="text-sm text-white/35">{currentCase.dateRange}</span>
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                            {currentCase.title}
-                        </h1>
-                        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-white/50 mb-6">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">{currentCase.title}</h1>
+                        <div className="flex items-center gap-6 text-sm text-white/50 mb-6">
                             <p><strong className="text-white/70">Actor:</strong> {currentCase.plaintiff.name}</p>
                             <p><strong className="text-white/70">Demandado:</strong> {currentCase.defendant.name}</p>
                         </div>
-                        <div className="flex flex-wrap gap-4 mt-6">
-                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-sm transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.3),0_0_60px_rgba(168,85,247,0.15)] hover:-translate-y-0.5">
+                        <div className="flex gap-3">
+                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl bg-purple-600 text-white font-semibold text-sm hover:bg-purple-500 transition-colors">
                                 <Scale className="w-4 h-4 mr-2" />
                                 Ir a Estrategia
                             </button>
-                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white/80 font-semibold text-sm transition-all duration-300 hover:bg-white/[0.1] hover:border-white/20">
+                            <button className="inline-flex items-center px-5 py-2.5 rounded-xl border border-[#2a2a35] text-white/70 font-medium text-sm hover:bg-white/[0.05] transition-colors">
                                 <Target className="w-4 h-4 mr-2" />
                                 Iniciar Simulación
                             </button>
                         </div>
                     </div>
-                </GlassCard>
+                </Card>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { label: "Total Deuda", value: formatCurrency(currentCase.totalDebt), Icon: DollarSign, accent: "border-l-red-500/50", textColor: "text-red-400", iconColor: "text-red-400/60" },
-                        { label: "Total Pagado", value: formatCurrency(currentCase.totalPaid), Icon: DollarSign, accent: "border-l-green-500/50", textColor: "text-green-400", iconColor: "text-green-400/60" },
-                        { label: "Evidencia", value: currentCase.evidenceCount, Icon: Folder, accent: "border-l-blue-500/50", textColor: "text-blue-400", iconColor: "text-blue-400/60" },
-                        { label: "Transcripciones", value: currentCase.transcriptionCount, Icon: MessageSquare, accent: "border-l-purple-500/50", textColor: "text-purple-400", iconColor: "text-purple-400/60" },
+                        { label: "TOTAL DEUDA", value: fmt(currentCase.totalDebt), Icon: DollarSign, border: "border-t-red-500", text: "text-red-400", icon: "text-red-400/40" },
+                        { label: "TOTAL PAGADO", value: fmt(currentCase.totalPaid), Icon: DollarSign, border: "border-t-green-500", text: "text-green-400", icon: "text-green-400/40" },
+                        { label: "EVIDENCIA", value: "124", Icon: Folder, border: "border-t-blue-500", text: "text-white", icon: "text-blue-400/40" },
+                        { label: "TRANSCRIPCIONES", value: "12", Icon: MessageSquare, border: "border-t-purple-500", text: "text-white", icon: "text-purple-400/40" },
                     ].map((s, i) => (
-                        <GlassCard key={i} className={`p-5 border-l-[3px] ${s.accent} group`}>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-semibold text-white/40 text-xs uppercase tracking-wider">{s.label}</h3>
-                                <s.Icon className={`w-5 h-5 ${s.iconColor}`} />
+                        <Card key={i} className={`p-5 border-t-2 ${s.border}`}>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-xs font-semibold text-white/40 uppercase tracking-wider">{s.label}</h3>
+                                <s.Icon className={`w-4 h-4 ${s.icon}`} />
                             </div>
-                            <p className={`text-2xl font-bold ${s.textColor}`}>{s.value}</p>
-                        </GlassCard>
+                            <p className={`text-2xl font-bold ${s.text}`}>{s.value}</p>
+                        </Card>
                     ))}
                 </div>
 
                 {/* Activity + Embargos */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-4">
-                        <h2 className="text-lg font-bold text-white/90">Actividad Reciente</h2>
-                        <GlassCard className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div className="lg:col-span-3 space-y-4">
+                        <h2 className="text-lg font-bold text-white">Actividad Reciente</h2>
+                        <Card className="p-6">
                             <div className="space-y-6">
                                 {[
                                     { Icon: Folder, bg: "bg-blue-500/10", ic: "text-blue-400", title: "Nuevos PDF procesados", desc: "Se ingresaron 14 PDFs sobre estado de cuenta bancaria", time: "Hace 2 horas" },
                                     { Icon: Scale, bg: "bg-purple-500/10", ic: "text-purple-400", title: "Actualización de estrategia", desc: "El cargo de 'Usura' fue actualizado con nueva evidencia", time: "Ayer" },
                                     { Icon: MessageSquare, bg: "bg-green-500/10", ic: "text-green-400", title: "Transcripción completada", desc: "Audio WhatsApp #14 procesado exitosamente", time: "Hace 2 días" },
-                                    { Icon: Calendar, bg: "bg-white/[0.05]", ic: "text-white/50", title: "Cambio de estado", desc: "El caso pasó a Fase de Ejecución", time: "Hace 3 días" },
+                                    { Icon: Calendar, bg: "bg-white/[0.05]", ic: "text-white/40", title: "Cambio de estado", desc: "El caso pasó a Fase de Ejecución", time: "Hace 3 días" },
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-4">
                                         <div className={`mt-0.5 p-2.5 rounded-xl shrink-0 ${item.bg}`}>
                                             <item.Icon className={`w-5 h-5 ${item.ic}`} />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-white/80">{item.title}</p>
+                                            <p className="text-sm font-semibold text-white/85">{item.title}</p>
                                             <p className="text-sm text-white/40 mt-0.5">{item.desc}</p>
                                             <p className="text-xs text-white/25 mt-2">{item.time}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </GlassCard>
+                        </Card>
                     </div>
 
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-bold text-white/90">Estado de Embargos</h2>
-                        <GlassCard className="p-6 border-l-[3px] border-l-yellow-500/50">
-                            <h3 className="font-semibold text-yellow-400 mb-2">Acción Requerida</h3>
-                            <p className="text-sm text-yellow-400/60 mb-4">
+                    <div className="lg:col-span-2 space-y-4">
+                        <h2 className="text-lg font-bold text-white">Estado de Embargos</h2>
+                        <Card className="p-6 border-l-2 border-l-yellow-500/60">
+                            <h3 className="font-bold text-yellow-400 mb-2">Acción Requerida</h3>
+                            <p className="text-sm text-white/45 mb-6 leading-relaxed">
                                 Tenés 2 cuentas bancarias pendientes de embargo y no fueron localizadas por el sistema oficial.
                             </p>
-                            <button className="w-full px-4 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-medium transition-all duration-300 hover:bg-yellow-500/20 hover:border-yellow-500/30 hover:shadow-[0_0_16px_rgba(234,179,8,0.1)]">
+                            <button className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-[#2a2a35] text-white/80 text-sm font-medium hover:bg-white/[0.08] transition-colors">
                                 Corregir Oficios
                             </button>
-                        </GlassCard>
+                        </Card>
                     </div>
                 </div>
             </div>
-
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translate(0, 0) scale(1); }
-                    33% { transform: translate(30px, -30px) scale(1.05); }
-                    66% { transform: translate(-20px, 20px) scale(0.95); }
-                }
-            `}</style>
         </div>
     );
 }
