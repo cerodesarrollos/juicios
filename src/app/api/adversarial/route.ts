@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AdversarialRound, AdversarialSession } from '@/lib/types'
 import { anthropic } from '@/lib/anthropic'
 import { supabaseServer } from '@/lib/supabase-server'
-import { searchEvidence, getEmbeddedCount, formatEvidenceForPrompt } from '@/lib/evidence-search'
+import { searchEvidence, searchEvidenceWithContext, getEmbeddedCount, formatEvidenceForPrompt, formatContextEvidenceForPrompt } from '@/lib/evidence-search'
 
 const DEFAULT_MODEL = 'claude-opus-4-20250514'
 
@@ -197,8 +197,10 @@ async function getSystemPrompt(caseId: string, searchQuery: string): Promise<{ s
 
   if (embeddedCount > 0) {
     const caseData = await fetchCaseData(caseId)
-    const chunks = await searchEvidence(caseId, searchQuery, 30)
-    const relevantEvidence = formatEvidenceForPrompt(chunks)
+    // Use context-expanded search: each matching message brings ±10 surrounding messages
+    const { chunks: nonChatChunks, contextMessages } = await searchEvidenceWithContext(caseId, searchQuery, 20, 10)
+    const relevantEvidence = formatContextEvidenceForPrompt(nonChatChunks, contextMessages)
+    console.log(`[RAG+Context] Query: "${searchQuery.substring(0, 80)}..." → ${contextMessages.length} conversation blocks, ${nonChatChunks.length} other chunks`)
     return { systemPrompt: buildRAGSystemPrompt(caseData, relevantEvidence), useRAG: true }
   }
 
@@ -360,8 +362,8 @@ Responde en este formato JSON exacto:
     
     if (action === 'build') {
       // User writes a rough argument idea, AI builds a proper prosecution argument with evidence
-      const searchResults = await searchEvidence(case_id, user_input || '', 40)
-      const evidenceContext = formatEvidenceForPrompt(searchResults)
+      const { chunks: buildNonChat, contextMessages: buildCtx } = await searchEvidenceWithContext(case_id, user_input || '', 25, 10)
+      const evidenceContext = formatContextEvidenceForPrompt(buildNonChat, buildCtx)
 
       const { systemPrompt: buildSystemPrompt } = await getSystemPrompt(case_id, user_input || 'construir argumento')
       const response = await anthropic.messages.create({
