@@ -41,10 +41,10 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
         <Card>
             <div className="p-5">
                 <div className="flex items-center justify-between mb-4">
-                    <span className="text-[11px] font-semibold text-white/25 uppercase tracking-[0.14em]">{label}</span>
+                    <span className="text-[11px] font-normal text-white/25 uppercase tracking-[0.14em]">{label}</span>
                     <div className="text-white/15">{icon}</div>
                 </div>
-                <p className="text-[26px] font-bold text-white/90 leading-none tracking-tight">{value}</p>
+                <p className="text-[28px] font-medium text-white/90 leading-none tracking-tight">{value}</p>
             </div>
         </Card>
     );
@@ -57,8 +57,8 @@ function ActivityItem({ icon, title, desc, time, last = false }: { icon: React.R
                 {icon}
             </div>
             <div className="min-w-0 pt-0.5">
-                <p className="text-[13px] font-semibold text-white/85 leading-snug">{title}</p>
-                <p className="text-[13px] text-white/30 mt-1 leading-relaxed">{desc}</p>
+                <p className="text-[13px] font-medium text-white/85 leading-snug">{title}</p>
+                <p className="text-[13px] font-light text-white/30 mt-1 leading-relaxed">{desc}</p>
                 <p className="text-[11px] text-white/15 mt-1.5 font-medium">{time}</p>
             </div>
         </div>
@@ -115,7 +115,7 @@ export default function PreviewPage() {
                                 <span className="text-[12px] text-white/18 ml-1">{c.dateRange}</span>
                             </div>
 
-                            <h1 className="text-[28px] font-bold text-white tracking-tight mb-3 leading-tight">
+                            <h1 className="text-[30px] font-medium text-white tracking-tight mb-3 leading-tight">
                                 {c.title}
                             </h1>
 
@@ -149,7 +149,7 @@ export default function PreviewPage() {
                 {/* ── Content ── */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                     <div className="lg:col-span-3 space-y-3">
-                        <h2 className="text-[14px] font-bold text-white/50 pl-1">Actividad Reciente</h2>
+                        <h2 className="text-[14px] font-normal text-white/40 pl-1">Actividad Reciente</h2>
                         <Card>
                             <div className="px-6 py-1">
                                 <ActivityItem icon={<IconFolder className="w-[18px] h-[18px]" />} title="Nuevos PDF procesados" desc="Se ingresaron 14 PDFs sobre estado de cuenta bancaria" time="Hace 2 horas" />
@@ -161,7 +161,7 @@ export default function PreviewPage() {
                     </div>
 
                     <div className="lg:col-span-2 space-y-3">
-                        <h2 className="text-[14px] font-bold text-white/50 pl-1">Estado de Embargos</h2>
+                        <h2 className="text-[14px] font-normal text-white/40 pl-1">Estado de Embargos</h2>
                         <Card>
                             <div className="p-6">
                                 <div className="flex items-start gap-3.5 mb-5">
@@ -169,8 +169,8 @@ export default function PreviewPage() {
                                         <IconAlert className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="text-[14px] font-bold text-white/85">Accion Requerida</h3>
-                                        <p className="text-[13px] text-white/30 mt-1.5 leading-relaxed">
+                                        <h3 className="text-[14px] font-semibold text-white/85">Accion Requerida</h3>
+                                        <p className="text-[13px] font-light text-white/30 mt-1.5 leading-relaxed">
                                             Tenes 2 cuentas bancarias pendientes de embargo y no fueron localizadas por el sistema oficial.
                                         </p>
                                     </div>
