@@ -21,7 +21,6 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
   const caseSlug = caseMatch ? caseMatch[1] : null
   const isChatPage = pathname.includes('/chat')
 
-  // Auto-open chat submenu when on chat page
   useEffect(() => {
     if (isChatPage) setChatOpen(true)
   }, [isChatPage])
@@ -56,16 +55,16 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
     { label: 'Configuracion', tab: 'config' },
   ]
 
+  const linkBase = 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors'
+  const linkInactive = 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+  const linkActive = 'bg-white/[0.06] text-white/90 font-semibold'
+
   return (
-    <aside className="no-print flex h-full w-56 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
+    <aside className="no-print flex h-full w-56 flex-shrink-0 flex-col border-r border-white/[0.06] bg-[#111114]">
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
         <Link
           href="/"
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            pathname === '/'
-              ? 'border-l-3 border-green-800 bg-green-50 text-green-800'
-              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-          }`}
+          className={`${linkBase} ${pathname === '/' ? linkActive : linkInactive}`}
         >
           <span>&#127968;</span>
           <span>Inicio</span>
@@ -73,10 +72,10 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
 
         {caseSlug && (
           <div className="mt-4">
-            <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/20">
               Caso Actual
             </p>
-            <p className="px-3 py-1 text-sm font-semibold text-green-800 truncate">
+            <p className="px-3 py-1 text-sm font-semibold text-white/70 truncate">
               {caseName ?? caseSlug}
             </p>
             <div className="mt-1 space-y-0.5">
@@ -84,54 +83,39 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                 <Link
                   key={item.tab}
                   href={`/case/${caseSlug}?tab=${item.tab}`}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  className={`${linkBase} ${linkInactive}`}
                 >
                   <span>{item.label}</span>
                 </Link>
               ))}
 
-              {/* Estrategia */}
               <Link
                 href={`/case/${caseSlug}/strategy`}
                 onClick={onNavigate}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  pathname.includes('/strategy')
-                    ? 'bg-green-50 text-green-800 font-semibold'
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                className={`${linkBase} ${pathname.includes('/strategy') ? linkActive : linkInactive}`}
               >
                 <span>⚖️ Estrategia</span>
               </Link>
 
-              {/* Simulacion Adversarial */}
               <Link
                 href={`/case/${caseSlug}/adversarial`}
                 onClick={onNavigate}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  pathname.includes('/adversarial')
-                    ? 'bg-green-50 text-green-800 font-semibold'
-                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                className={`${linkBase} ${pathname.includes('/adversarial') ? linkActive : linkInactive}`}
               >
                 <span>Sim. Adversarial</span>
               </Link>
 
-              {/* Chat with expandable chapters */}
+              {/* Chat */}
               <div>
                 <button
                   onClick={() => setChatOpen(!chatOpen)}
                   className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isChatPage
-                      ? 'bg-green-50 text-green-800 font-semibold'
-                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    isChatPage ? linkActive : linkInactive
                   }`}
                 >
                   <span>💬 Chat</span>
                   <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="currentColor"
+                    width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
                     className={`transition-transform duration-200 ${chatOpen ? 'rotate-90' : ''}`}
                   >
                     <path d="M4 2l5 4-5 4z" />
@@ -139,26 +123,24 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                 </button>
 
                 {chatOpen && (
-                  <div className="ml-3 mt-0.5 space-y-0.5 border-l-2 border-gray-100 pl-2">
-                    {/* Chat Completo */}
+                  <div className="ml-3 mt-0.5 space-y-0.5 border-l-2 border-white/[0.06] pl-2">
                     <Link
                       href={`/case/${caseSlug}/chat`}
                       className={`flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                        isChatPage ? 'text-green-700 hover:bg-green-50' : 'text-gray-500 hover:bg-gray-50'
+                        isChatPage ? 'text-white/60 hover:bg-white/[0.04]' : linkInactive
                       }`}
                     >
                       <span>Chat Completo</span>
                     </Link>
 
-                    {/* Chapters ordered */}
                     {chapters.map(ch => (
                       <Link
                         key={ch.chapter}
                         href={`/case/${caseSlug}/chat?chapter=${ch.chapter}`}
-                        className="flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                        className={`flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-medium ${linkInactive}`}
                       >
                         <span className="truncate">{ch.chapter}. {ch.name}</span>
-                        <span className="ml-1 flex-shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-400">
+                        <span className="ml-1 flex-shrink-0 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-white/25">
                           {ch.count}
                         </span>
                       </Link>
@@ -171,14 +153,11 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
               <div>
                 <button
                   onClick={() => setDocsOpen(!docsOpen)}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${linkInactive}`}
                 >
                   <span>📋 Doc. Respaldatoria</span>
                   <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="currentColor"
+                    width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
                     className={`transition-transform duration-200 ${docsOpen ? 'rotate-90' : ''}`}
                   >
                     <path d="M4 2l5 4-5 4z" />
@@ -186,7 +165,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                 </button>
 
                 {docsOpen && (
-                  <div className="ml-3 mt-0.5 space-y-0.5 border-l-2 border-gray-100 pl-2">
+                  <div className="ml-3 mt-0.5 space-y-0.5 border-l-2 border-white/[0.06] pl-2">
                     {[
                       { label: 'Informes DNRPA', slug: 'informes-dnrpa' },
                       { label: 'Informe BCRA', slug: 'informe-bcra' },
@@ -198,7 +177,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
                       <Link
                         key={doc.slug}
                         href={`/case/${caseSlug}/docs?doc=${doc.slug}`}
-                        className="flex items-center rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                        className={`flex items-center rounded-lg px-3 py-1.5 text-xs font-medium ${linkInactive}`}
                       >
                         <span>{doc.label}</span>
                       </Link>
@@ -211,7 +190,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void } = {}
         )}
       </nav>
 
-      <div className="border-t border-gray-200 p-4 text-xs text-gray-400">
+      <div className="border-t border-white/[0.06] p-4 text-xs text-white/20">
         Juicios v2.0
       </div>
     </aside>
