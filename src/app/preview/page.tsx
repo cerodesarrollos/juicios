@@ -1,31 +1,17 @@
 "use client";
 
 import React from "react";
+import {
+    Scales,
+    Crosshair,
+    FolderOpen,
+    ChatText,
+    CurrencyDollar,
+    CalendarBlank,
+    Warning,
+} from "@phosphor-icons/react";
 
-/* ── SVG Icons ── */
-function IconScale({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M24 6v36M6 18l6-12h24l6 12M6 18h12M30 18h12" /><circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" /><circle cx="36" cy="18" r="1" fill="currentColor" stroke="none" /></svg>;
-}
-function IconTarget({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="24" cy="24" r="20" /><circle cx="24" cy="24" r="12" /><circle cx="24" cy="24" r="4" /></svg>;
-}
-function IconFolder({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 14v20a4 4 0 004 4h28a4 4 0 004-4V18a4 4 0 00-4-4H24l-4-4H10a4 4 0 00-4 4z" /></svg>;
-}
-function IconChat({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M42 30a4 4 0 01-4 4H14l-8 8V10a4 4 0 014-4h28a4 4 0 014 4z" /></svg>;
-}
-function IconDollar({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M24 4v40m10-34H19a7 7 0 000 14h10a7 7 0 010 14H14" /></svg>;
-}
-function IconCalendar({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="8" width="36" height="36" rx="4" /><path d="M32 4v8M16 4v8M6 20h36" /></svg>;
-}
-function IconAlert({ className = "" }: { className?: string }) {
-    return <svg className={className} viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M24 18v8m0 6h.02" /><path d="M21.17 6.98L3.87 36a3 3 0 002.63 4.5h34.5a3 3 0 002.63-4.5L26.83 6.98a3 3 0 00-5.66 0z" /></svg>;
-}
-
-/* ── Card: gradient border trick via padding + rounded clip ── */
+/* ── Card ── */
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
     return (
         <div className={`rounded-[20px] p-px bg-gradient-to-b from-[#2a2a2e] to-[#1a1a1d] ${className}`}>
@@ -65,7 +51,6 @@ function ActivityItem({ icon, title, desc, time, last = false }: { icon: React.R
     );
 }
 
-/* ── Data ── */
 const c = {
     title: "Toro, Franco Chaves s/ Estafa y Defraudacion",
     status: "En investigacion",
@@ -73,8 +58,6 @@ const c = {
     defendant: "Franco Chaves (Toro)",
     totalDebt: 45000,
     totalPaid: 15000,
-    evidenceCount: 124,
-    transcriptionCount: 12,
     dateRange: "Mar 2023 - Presente",
     caseType: "Penal Economico",
 };
@@ -84,11 +67,9 @@ export default function PreviewPage() {
 
     return (
         <div className="min-h-screen bg-[#0c0c0f] text-white antialiased">
-            {/* Subtle top vignette */}
             <div className="fixed inset-0 pointer-events-none" style={{
                 background: "radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255,255,255,0.012) 0%, transparent 100%)"
             }} />
-            {/* Noise */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.02]" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
                 backgroundSize: "128px 128px"
@@ -96,11 +77,11 @@ export default function PreviewPage() {
 
             <div className="relative z-10 max-w-[1100px] mx-auto px-6 py-8 space-y-5">
 
-                {/* ── Hero ── */}
+                {/* Hero */}
                 <Card>
                     <div className="p-8 relative overflow-hidden">
-                        <div className="absolute -top-6 -right-4 opacity-[0.02]">
-                            <IconScale className="w-48 h-48" />
+                        <div className="absolute -top-2 -right-2 opacity-[0.025]">
+                            <Scales size={180} weight="thin" />
                         </div>
                         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
@@ -126,11 +107,11 @@ export default function PreviewPage() {
 
                             <div className="flex gap-3">
                                 <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] bg-[#1e1e22] text-white/80 font-bold text-[13px] border border-white/[0.08] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.04)] transition-all duration-150 hover:bg-[#222226] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
-                                    <IconScale className="w-4 h-4 mr-2 opacity-50" />
+                                    <Scales size={16} weight="light" className="mr-2 opacity-50" />
                                     Ir a Estrategia
                                 </button>
                                 <button className="group inline-flex items-center px-6 py-2.5 rounded-[14px] bg-[#1a1a1e] text-white/45 font-semibold text-[13px] border border-white/[0.06] shadow-[inset_0_2px_4px_rgba(0,0,0,0.4),inset_0_-1px_0_rgba(255,255,255,0.03)] transition-all duration-150 hover:bg-[#1e1e22] active:shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
-                                    <IconTarget className="w-4 h-4 mr-2 opacity-40" />
+                                    <Crosshair size={16} weight="light" className="mr-2 opacity-40" />
                                     Iniciar Simulacion
                                 </button>
                             </div>
@@ -138,24 +119,24 @@ export default function PreviewPage() {
                     </div>
                 </Card>
 
-                {/* ── Stats ── */}
+                {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard label="Total Deuda" value={fmt(c.totalDebt)} icon={<IconDollar className="w-[18px] h-[18px]" />} />
-                    <StatCard label="Total Pagado" value={fmt(c.totalPaid)} icon={<IconDollar className="w-[18px] h-[18px]" />} />
-                    <StatCard label="Evidencia" value="124" icon={<IconFolder className="w-[18px] h-[18px]" />} />
-                    <StatCard label="Transcripciones" value="12" icon={<IconChat className="w-[18px] h-[18px]" />} />
+                    <StatCard label="Total Deuda" value={fmt(c.totalDebt)} icon={<CurrencyDollar size={18} weight="thin" />} />
+                    <StatCard label="Total Pagado" value={fmt(c.totalPaid)} icon={<CurrencyDollar size={18} weight="thin" />} />
+                    <StatCard label="Evidencia" value="124" icon={<FolderOpen size={18} weight="thin" />} />
+                    <StatCard label="Transcripciones" value="12" icon={<ChatText size={18} weight="thin" />} />
                 </div>
 
-                {/* ── Content ── */}
+                {/* Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
                     <div className="lg:col-span-3 space-y-3">
                         <h2 className="text-[14px] font-normal text-white/40 pl-1">Actividad Reciente</h2>
                         <Card>
                             <div className="px-6 py-1">
-                                <ActivityItem icon={<IconFolder className="w-[18px] h-[18px]" />} title="Nuevos PDF procesados" desc="Se ingresaron 14 PDFs sobre estado de cuenta bancaria" time="Hace 2 horas" />
-                                <ActivityItem icon={<IconScale className="w-[18px] h-[18px]" />} title="Actualizacion de estrategia" desc="El cargo de 'Usura' fue actualizado con nueva evidencia" time="Ayer" />
-                                <ActivityItem icon={<IconChat className="w-[18px] h-[18px]" />} title="Transcripcion completada" desc="Audio WhatsApp #14 procesado exitosamente" time="Hace 2 dias" />
-                                <ActivityItem icon={<IconCalendar className="w-[18px] h-[18px]" />} title="Cambio de estado" desc="El caso paso a Fase de Ejecucion" time="Hace 3 dias" last />
+                                <ActivityItem icon={<FolderOpen size={18} weight="light" />} title="Nuevos PDF procesados" desc="Se ingresaron 14 PDFs sobre estado de cuenta bancaria" time="Hace 2 horas" />
+                                <ActivityItem icon={<Scales size={18} weight="light" />} title="Actualizacion de estrategia" desc="El cargo de 'Usura' fue actualizado con nueva evidencia" time="Ayer" />
+                                <ActivityItem icon={<ChatText size={18} weight="light" />} title="Transcripcion completada" desc="Audio WhatsApp #14 procesado exitosamente" time="Hace 2 dias" />
+                                <ActivityItem icon={<CalendarBlank size={18} weight="light" />} title="Cambio de estado" desc="El caso paso a Fase de Ejecucion" time="Hace 3 dias" last />
                             </div>
                         </Card>
                     </div>
@@ -166,7 +147,7 @@ export default function PreviewPage() {
                             <div className="p-6">
                                 <div className="flex items-start gap-3.5 mb-5">
                                     <div className="w-10 h-10 rounded-[14px] bg-white/[0.04] border border-white/[0.06] shrink-0 flex items-center justify-center text-white/30">
-                                        <IconAlert className="w-5 h-5" />
+                                        <Warning size={20} weight="light" />
                                     </div>
                                     <div>
                                         <h3 className="text-[14px] font-semibold text-white/85">Accion Requerida</h3>
