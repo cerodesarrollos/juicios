@@ -88,16 +88,16 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
   return (
     <div className="flex h-full flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-3 md:px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0d0d14] px-3 md:px-4 py-2.5">
         <div className="flex items-center gap-2 md:gap-3">
-          <h1 className="text-sm font-semibold text-gray-800">💬 Chat</h1>
+          <h1 className="text-sm font-semibold text-white/80">💬 Chat</h1>
           {selectedChapter !== null && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] md:text-xs font-medium text-green-700">
+            <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] md:text-xs font-medium text-green-400">
               Cap. {selectedChapter}
             </span>
           )}
           {weakPoints && (
-            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] md:text-xs font-medium text-red-700">
+            <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] md:text-xs font-medium text-red-400">
               Puntos debiles
             </span>
           )}
@@ -106,7 +106,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
           {/* Mobile search toggle */}
           <button
             onClick={() => setMobileSearch(!mobileSearch)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 md:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.10] text-white/50 hover:bg-white/[0.06] md:hidden"
           >
             &#128269;
           </button>
@@ -117,9 +117,9 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
               placeholder="Ir a ID..."
               value={jumpInput}
               onChange={e => setJumpInput(e.target.value)}
-              className="w-28 rounded-l-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs focus:border-green-600 focus:outline-none focus:ring-1 focus:ring-green-600"
+              className="w-28 rounded-l-lg border border-white/[0.10] bg-white/[0.06] px-2.5 py-1.5 text-xs text-white/80 placeholder:text-white/30 focus:border-green-500/50 focus:outline-none focus:ring-1 focus:ring-green-500/50"
             />
-            <button type="submit" className="rounded-r-lg bg-green-800 px-2.5 py-1.5 text-xs text-white hover:bg-green-700">
+            <button type="submit" className="rounded-r-lg bg-green-700 px-2.5 py-1.5 text-xs text-white hover:bg-green-600">
               Ir
             </button>
           </form>
@@ -129,9 +129,9 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
               placeholder="Buscar mensajes..."
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
-              className="w-48 rounded-l-lg border border-gray-200 bg-white px-3 py-1.5 text-xs focus:border-green-600 focus:outline-none focus:ring-1 focus:ring-green-600"
+              className="w-48 rounded-l-lg border border-white/[0.10] bg-white/[0.06] px-3 py-1.5 text-xs text-white/80 placeholder:text-white/30 focus:border-green-500/50 focus:outline-none focus:ring-1 focus:ring-green-500/50"
             />
-            <button type="submit" className="rounded-r-lg bg-green-800 px-3 py-1.5 text-xs text-white hover:bg-green-700">
+            <button type="submit" className="rounded-r-lg bg-green-700 px-3 py-1.5 text-xs text-white hover:bg-green-600">
               &#128269;
             </button>
           </form>
@@ -139,13 +139,13 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`rounded-lg border px-2 md:px-3 py-1.5 text-xs transition-colors ${
-              showFilters ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+              showFilters ? 'border-green-500/30 bg-green-900/30 text-green-400' : 'border-white/[0.10] bg-white/[0.06] text-white/60 hover:bg-white/[0.08]'
             }`}
           >
             Filtros
           </button>
           {hasFilters && (
-            <button onClick={clearFilters} className="rounded-lg px-2 py-1.5 text-xs text-red-500 hover:bg-red-50">
+            <button onClick={clearFilters} className="rounded-lg px-2 py-1.5 text-xs text-red-400 hover:bg-red-900/30">
               Limpiar
             </button>
           )}
@@ -154,16 +154,16 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
 
       {/* Mobile search bar (expanded) */}
       {mobileSearch && (
-        <div className="flex flex-col gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2 md:hidden">
+        <div className="flex flex-col gap-2 border-b border-white/[0.08] bg-[#111119] px-3 py-2 md:hidden">
           <form onSubmit={handleSearch} className="flex">
             <input
               type="text"
               placeholder="Buscar mensajes..."
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
-              className="flex-1 rounded-l-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-1 focus:ring-green-600"
+              className="flex-1 rounded-l-lg border border-white/[0.10] bg-white/[0.06] px-3 py-2 text-sm text-white/80 placeholder:text-white/30 focus:border-green-500/50 focus:outline-none focus:ring-1 focus:ring-green-500/50"
             />
-            <button type="submit" className="rounded-r-lg bg-green-800 px-3 py-2 text-sm text-white hover:bg-green-700">
+            <button type="submit" className="rounded-r-lg bg-green-700 px-3 py-2 text-sm text-white hover:bg-green-600">
               &#128269;
             </button>
           </form>
@@ -173,9 +173,9 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
               placeholder="Ir a ID de evidencia..."
               value={jumpInput}
               onChange={e => setJumpInput(e.target.value)}
-              className="flex-1 rounded-l-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-1 focus:ring-green-600"
+              className="flex-1 rounded-l-lg border border-white/[0.10] bg-white/[0.06] px-3 py-2 text-sm text-white/80 placeholder:text-white/30 focus:border-green-500/50 focus:outline-none focus:ring-1 focus:ring-green-500/50"
             />
-            <button type="submit" className="rounded-r-lg bg-green-800 px-3 py-2 text-sm text-white hover:bg-green-700">
+            <button type="submit" className="rounded-r-lg bg-green-700 px-3 py-2 text-sm text-white hover:bg-green-600">
               Ir
             </button>
           </form>
@@ -184,11 +184,11 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
 
       {/* Filters bar */}
       {showFilters && (
-        <div className="flex items-center gap-3 border-b border-gray-200 bg-gray-50 px-4 py-2">
+        <div className="flex items-center gap-3 border-b border-white/[0.08] bg-[#111119] px-4 py-2">
           <select
             value={sender}
             onChange={e => setSender(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+            className="rounded-lg border border-white/[0.10] bg-white/[0.06] px-2.5 py-1.5 text-xs text-white/80 focus:border-green-500/50 focus:outline-none"
           >
             <option value="">Todos los remitentes</option>
             <option value="Matias">Matias</option>
@@ -197,7 +197,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
           <select
             value={messageType}
             onChange={e => setMessageType(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+            className="rounded-lg border border-white/[0.10] bg-white/[0.06] px-2.5 py-1.5 text-xs text-white/80 focus:border-green-500/50 focus:outline-none"
           >
             <option value="">Todos los tipos</option>
             <option value="text">Texto</option>
@@ -209,40 +209,40 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
             <option value="deleted">Eliminado</option>
             <option value="system">Sistema</option>
           </select>
-          <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-white/60 cursor-pointer">
             <input
               type="checkbox"
               checked={keyEvidence}
               onChange={e => setKeyEvidence(e.target.checked)}
-              className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+              className="rounded border-white/20 bg-white/[0.06] text-green-500 focus:ring-green-500/50"
             />
             Prueba clave
           </label>
-          <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-white/60 cursor-pointer">
             <input
               type="checkbox"
               checked={weakPoints}
               onChange={e => setWeakPoints(e.target.checked)}
-              className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+              className="rounded border-white/20 bg-white/[0.06] text-green-500 focus:ring-green-500/50"
             />
             Punto debil
           </label>
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-600">Desde:</label>
+            <label className="text-xs text-white/60">Desde:</label>
             <input
               type="date"
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+              className="rounded-lg border border-white/[0.10] bg-white/[0.06] px-2 py-1.5 text-xs text-white/80 focus:border-green-500/50 focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-1.5">
-            <label className="text-xs text-gray-600">Hasta:</label>
+            <label className="text-xs text-white/60">Hasta:</label>
             <input
               type="date"
               value={dateTo}
               onChange={e => setDateTo(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-xs focus:border-green-600 focus:outline-none"
+              className="rounded-lg border border-white/[0.10] bg-white/[0.06] px-2 py-1.5 text-xs text-white/80 focus:border-green-500/50 focus:outline-none"
             />
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
       {/* Main content — responsive columns */}
       <div className="flex flex-1 overflow-hidden relative">
         {/* Chat column — full on mobile, 50% on desktop */}
-        <div className="flex w-full md:w-1/2 flex-col overflow-hidden md:border-r border-gray-200">
+        <div className="flex w-full md:w-1/2 flex-col overflow-hidden md:border-r border-white/[0.08]">
           <ChatView
             caseId={caseData.id}
             chapter={selectedChapter}
@@ -303,7 +303,7 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
         {selectedMessage && !mobileEvidence && (
           <button
             onClick={() => setMobileEvidence(true)}
-            className="fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-green-800 text-white shadow-lg hover:bg-green-700 md:hidden"
+            className="fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-green-700 text-white shadow-lg shadow-green-900/50 hover:bg-green-600 md:hidden"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />

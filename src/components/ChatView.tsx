@@ -77,7 +77,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
   if (isSystem) {
     return (
       <div className="flex justify-center my-1">
-        <span className="rounded-lg bg-gray-100 px-3 py-1 text-xs text-gray-500 italic">
+        <span className="rounded-lg bg-white/[0.06] px-3 py-1 text-xs text-white/40 italic">
           {msg.message_text}
         </span>
       </div>
@@ -100,18 +100,18 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         onClick={onSelect}
         className={`relative max-w-[85%] md:max-w-[75%] rounded-xl px-3 py-2 cursor-pointer transition-shadow ${borderHighlight} ${
           isMatias
-            ? 'bg-green-100 text-gray-900'
-            : 'bg-white border border-gray-200 text-gray-900'
-        } ${isSelected ? 'ring-2 ring-green-500 shadow-md' : 'hover:shadow-sm'}`}
+            ? 'bg-green-900/40 text-white/90'
+            : 'bg-white/[0.08] border border-white/[0.08] text-white/90'
+        } ${isSelected ? 'ring-2 ring-green-500 shadow-md shadow-green-500/20' : 'hover:shadow-sm hover:shadow-white/5'}`}
       >
         {/* Sender name */}
-        <p className={`text-xs font-semibold mb-0.5 ${isMatias ? 'text-green-700' : 'text-blue-700'}`}>
+        <p className={`text-xs font-semibold mb-0.5 ${isMatias ? 'text-green-400' : 'text-blue-400'}`}>
           {msg.sender}
         </p>
 
         {/* Message content by type */}
         {isDeleted && (
-          <p className="text-sm text-gray-400 italic">Este mensaje fue eliminado</p>
+          <p className="text-sm text-white/30 italic">Este mensaje fue eliminado</p>
         )}
 
         {isAudio && (
@@ -123,12 +123,12 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
                 isOutgoing={isMatias}
               />
             ) : (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-200 text-green-700">
+              <div className="flex items-center gap-2 text-sm text-white/60">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-800/50 text-green-400">
                   &#9654;
                 </span>
                 <div className="flex-1">
-                  <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                  <div className="h-2 rounded-full bg-white/10 overflow-hidden">
                     <div className="h-full w-3/4 rounded-full bg-green-400" />
                   </div>
                 </div>
@@ -152,7 +152,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               />
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+            <div className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-white/50">
               <span className="text-2xl">📷</span>
               <span>{msg.file_name || 'Imagen'}</span>
             </div>
@@ -170,7 +170,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               />
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+            <div className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-white/50">
               <span className="text-2xl">🎬</span>
               <span>{msg.file_name || 'Video'}</span>
             </div>
@@ -180,14 +180,14 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         {isDocument && (
           msg.file_url ? (
             <div
-              className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-blue-600 cursor-pointer hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-blue-400 cursor-pointer hover:bg-white/[0.10] transition-colors"
               onClick={(e) => { e.stopPropagation(); onSelect(); }}
             >
               <span className="text-2xl">📄</span>
               <span className="underline truncate">{msg.file_name || 'Documento'}</span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+            <div className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-white/50">
               <span className="text-2xl">📄</span>
               <span>{msg.file_name || 'Documento'}</span>
             </div>
@@ -201,14 +201,14 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         )}
 
         {isContact && (
-          <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+          <div className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-white/50">
             <span className="text-2xl">&#128100;</span>
             <span>{msg.message_text || 'Contacto'}</span>
           </div>
         )}
 
         {isLocation && (
-          <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+          <div className="flex items-center gap-2 rounded-lg bg-white/[0.06] p-3 text-sm text-white/50">
             <span className="text-2xl">&#128205;</span>
             <span>{msg.message_text || 'Ubicacion'}</span>
           </div>
@@ -222,20 +222,20 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         <div className="mt-1 flex items-center justify-end gap-1.5">
           {(msg.is_key_evidence || msg.is_weak_point) && (
             <span className={`inline-block rounded px-1 py-0.5 text-[10px] font-medium ${
-              msg.is_key_evidence ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+              msg.is_key_evidence ? 'bg-yellow-500/20 text-yellow-300' : 'bg-red-500/20 text-red-300'
             }`}>
               {msg.is_key_evidence ? 'Clave' : 'Debil'}
             </span>
           )}
           {msg.chapter > 0 && (
-            <span className="inline-block rounded bg-blue-100 px-1 py-0.5 text-[10px] font-medium text-blue-600">
+            <span className="inline-block rounded bg-blue-500/20 px-1 py-0.5 text-[10px] font-medium text-blue-400">
               Cap.{msg.chapter}
             </span>
           )}
           <span className="rounded bg-green-800 px-1.5 py-0.5 font-mono text-[10px] text-white opacity-70 group-hover:opacity-100">
             {msg.evidence_id}
           </span>
-          <span className="text-[10px] text-gray-400">{formatTime(msg.message_date)}</span>
+          <span className="text-[10px] text-white/40">{formatTime(msg.message_date)}</span>
         </div>
       </div>
       {/* Action buttons — appear on hover */}
@@ -243,7 +243,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
         {/* Send to evidence panel */}
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(); }}
-          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/90 text-gray-400 shadow-sm ring-1 ring-gray-200 hover:bg-green-50 hover:text-green-600 hover:ring-green-300"
+          className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-white/40 shadow-sm ring-1 ring-white/[0.10] hover:bg-green-900/30 hover:text-green-400 hover:ring-green-500/30"
           title="Ver en panel de evidencia"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -268,7 +268,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full shadow-sm ring-1 transition-colors ${
                 msg.is_key_evidence
                   ? 'bg-yellow-100 text-yellow-600 ring-yellow-300'
-                  : 'bg-white/90 text-gray-400 ring-gray-200 hover:bg-yellow-50 hover:text-yellow-500 hover:ring-yellow-300'
+                  : 'bg-white/[0.08] text-white/40 ring-white/[0.10] hover:bg-yellow-900/30 hover:text-yellow-400 hover:ring-yellow-500/30'
               }`}
               title={msg.is_key_evidence ? 'Quitar relevante' : 'Marcar como relevante'}
             >
@@ -282,7 +282,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
               <button
                 ref={chapterBtnRef}
                 onClick={(e) => { e.stopPropagation(); setShowChapterMenu(!showChapterMenu) }}
-                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/90 text-gray-400 shadow-sm ring-1 ring-gray-200 hover:bg-blue-50 hover:text-blue-500 hover:ring-blue-300"
+                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-white/40 shadow-sm ring-1 ring-white/[0.10] hover:bg-blue-900/30 hover:text-blue-400 hover:ring-blue-500/30"
                 title="Mover a capítulo"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -293,7 +293,7 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
                 <>
                   <div className="fixed inset-0 z-[9998]" onClick={() => setShowChapterMenu(false)} />
                   <div
-                    className="fixed z-[9999] w-52 max-h-[200px] overflow-y-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-gray-200"
+                    className="fixed z-[9999] w-52 max-h-[200px] overflow-y-auto rounded-lg bg-[#1a1a2e] py-1 shadow-lg ring-1 ring-white/[0.10]"
                     style={{ top: menuPos.top, left: menuPos.left }}
                   >
                     {chapters.map(ch => (
@@ -309,8 +309,8 @@ function MessageBubble({ msg, isMatias, isSelected, onSelect, showActions, chapt
                           onUpdate?.(msg.id, { chapter: ch.chapter, chapter_name: ch.name })
                           setShowChapterMenu(false)
                         }}
-                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors hover:bg-gray-50 ${
-                          msg.chapter === ch.chapter ? 'font-semibold text-green-700 bg-green-50' : 'text-gray-700'
+                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-xs text-left transition-colors hover:bg-white/[0.08] ${
+                          msg.chapter === ch.chapter ? 'font-semibold text-green-400 bg-green-900/30' : 'text-white/70'
                         }`}
                       >
                         <span className="w-4 text-center">{ch.chapter}</span>
@@ -421,10 +421,10 @@ export default function ChatView({
   }
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto bg-[#f0ebe3] p-4" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23d5cec4\' fill-opacity=\'0.15\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}>
+    <div ref={scrollRef} className="flex-1 overflow-y-auto bg-[#0b0f14] p-4" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}>
       {/* Message count */}
       <div className="mb-3 text-center">
-        <span className="inline-block rounded-full bg-white/80 px-3 py-1 text-xs text-gray-500 shadow-sm">
+        <span className="inline-block rounded-full bg-white/[0.08] px-3 py-1 text-xs text-white/50 shadow-sm">
           {total.toLocaleString()} mensajes{chapter !== null ? ` en capitulo ${chapter}` : ''}
         </span>
       </div>
@@ -433,7 +433,7 @@ export default function ChatView({
         <div key={gi}>
           {/* Date separator */}
           <div className="my-3 flex justify-center">
-            <span className="rounded-lg bg-white/80 px-3 py-1 text-xs font-medium text-gray-500 shadow-sm">
+            <span className="rounded-lg bg-white/[0.08] px-3 py-1 text-xs font-medium text-white/50 shadow-sm">
               {formatDate(group.date)}
             </span>
           </div>
@@ -462,7 +462,7 @@ export default function ChatView({
         </div>
       )}
       {!hasMore && messages.length > 0 && (
-        <div className="py-4 text-center text-xs text-gray-400">Fin de los mensajes</div>
+        <div className="py-4 text-center text-xs text-white/30">Fin de los mensajes</div>
       )}
     </div>
   )
