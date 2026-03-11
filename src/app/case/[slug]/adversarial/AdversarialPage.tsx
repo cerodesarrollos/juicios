@@ -153,29 +153,29 @@ export default function AdversarialPage({ caseData }: Props) {
     w === 'prosecution' ? 'Acusacion' : w === 'defense' ? 'Defensa' : 'Empate'
 
   const winnerColor = (w: AdversarialRound['round_winner']) =>
-    w === 'prosecution' ? 'bg-red-100 text-red-700' : w === 'defense' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+    w === 'prosecution' ? 'bg-red-900/30 text-red-400' : w === 'defense' ? 'bg-blue-900/30 text-blue-400' : 'bg-white/[0.06] text-white/50'
 
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex-shrink-0 border-b border-gray-200 bg-white px-4 py-4 md:px-6">
+      <div className="flex-shrink-0 border-b border-white/[0.08] bg-[#0d0d14] px-4 py-4 md:px-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Simulacion Adversarial</h1>
-            <p className="text-sm text-gray-500">{caseData.plaintiff_name} vs {caseData.defendant_name}</p>
+            <h1 className="text-xl font-bold text-white/85">Simulacion Adversarial</h1>
+            <p className="text-sm text-white/40">{caseData.plaintiff_name} vs {caseData.defendant_name}</p>
             <div className="mt-2 flex items-center gap-2">
-              <label className="text-xs text-gray-500">Modelo:</label>
+              <label className="text-xs text-white/40">Modelo:</label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="rounded-lg border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none"
+                className="rounded-lg border border-white/[0.08] bg-[#111114] px-2 py-1 text-xs text-white/70 focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none"
               >
                 {models.map((m) => (
                   <option key={m.key} value={m.key}>{m.label} — {m.desc}</option>
                 ))}
               </select>
               {embeddedCount !== null && (
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${embeddedCount > 0 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${embeddedCount > 0 ? 'bg-green-900/30 text-green-400' : 'bg-yellow-900/30 text-yellow-400'}`}>
                   {embeddedCount > 0 ? `RAG: ${embeddedCount} chunks` : 'Sin RAG'}
                 </span>
               )}
@@ -183,15 +183,15 @@ export default function AdversarialPage({ caseData }: Props) {
           </div>
           {session && (
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 rounded-xl bg-red-50 px-3 py-1.5 text-sm">
-                <span className="font-medium text-red-700">Acusacion</span>
-                <span className="rounded-full bg-red-200 px-2 py-0.5 text-xs font-bold text-red-800">{session.overall_score.prosecution}/10</span>
+              <div className="flex items-center gap-2 rounded-xl bg-red-900/20 px-3 py-1.5 text-sm">
+                <span className="font-medium text-red-400">Acusacion</span>
+                <span className="rounded-full bg-red-900/40 px-2 py-0.5 text-xs font-bold text-red-300">{session.overall_score.prosecution}/10</span>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-1.5 text-sm">
-                <span className="font-medium text-blue-700">Defensa</span>
-                <span className="rounded-full bg-blue-200 px-2 py-0.5 text-xs font-bold text-blue-800">{session.overall_score.defense}/10</span>
+              <div className="flex items-center gap-2 rounded-xl bg-blue-900/20 px-3 py-1.5 text-sm">
+                <span className="font-medium text-blue-400">Defensa</span>
+                <span className="rounded-full bg-blue-900/40 px-2 py-0.5 text-xs font-bold text-blue-300">{session.overall_score.defense}/10</span>
               </div>
-              <div className="flex items-center gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-4 text-xs text-white/40">
                 <span>Resueltos: {session.overall_score.resolved_points}</span>
                 <span>Pendientes: {session.overall_score.unresolved_points}</span>
               </div>
@@ -204,23 +204,22 @@ export default function AdversarialPage({ caseData }: Props) {
       <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
         {!session ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm max-w-lg">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-600">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#161619] p-8 text-center shadow-lg max-w-lg">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/[0.06]">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/50">
                   <path d="M3 6l3-3h12l3 3M3 6v12l3 3h12l3-3V6M3 6h18M9 3v3M15 3v3" />
                 </svg>
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">Simulacion Adversarial</h2>
-              <p className="mt-2 text-sm text-gray-500">
+              <h2 className="text-lg font-semibold text-white/85">Simulacion Adversarial</h2>
+              <p className="mt-2 text-sm text-white/40">
                 El sistema analizara el caso desde ambas perspectivas: acusacion y defensa.
                 Generara argumentos, contraargumentos y evaluara la fortaleza de cada posicion
                 basandose en la evidencia disponible y articulos legales aplicables.
               </p>
 
-              {/* Embed evidence section */}
               {embeddedCount !== null && embeddedCount === 0 && (
-                <div className="mt-4 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
-                  <p className="text-sm text-yellow-800 mb-3">
+                <div className="mt-4 rounded-xl border border-yellow-500/20 bg-yellow-900/20 p-4">
+                  <p className="text-sm text-yellow-300 mb-3">
                     La evidencia no esta preparada para busqueda semantica. Preparala para obtener mejores resultados.
                   </p>
                   <button
@@ -231,25 +230,25 @@ export default function AdversarialPage({ caseData }: Props) {
                     {embedding ? 'Procesando...' : 'Preparar Evidencia'}
                   </button>
                   {embedStatus && (
-                    <p className="mt-2 text-xs text-yellow-700">{embedStatus}</p>
+                    <p className="mt-2 text-xs text-yellow-400">{embedStatus}</p>
                   )}
                 </div>
               )}
 
               {embeddedCount !== null && embeddedCount > 0 && (
-                <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-3">
-                  <p className="text-sm text-green-700">
+                <div className="mt-4 rounded-xl border border-green-500/20 bg-green-900/20 p-3">
+                  <p className="text-sm text-green-400">
                     Evidencia preparada: {embeddedCount} fragmentos indexados para busqueda semantica.
                   </p>
                   <button
                     onClick={handleEmbed}
                     disabled={embedding}
-                    className="mt-2 text-xs text-green-600 underline hover:text-green-800 disabled:opacity-50"
+                    className="mt-2 text-xs text-green-400 underline hover:text-green-300 disabled:opacity-50"
                   >
                     {embedding ? 'Re-procesando...' : 'Re-procesar evidencia'}
                   </button>
                   {embedStatus && (
-                    <p className="mt-1 text-xs text-green-600">{embedStatus}</p>
+                    <p className="mt-1 text-xs text-green-400">{embedStatus}</p>
                   )}
                 </div>
               )}
@@ -257,7 +256,7 @@ export default function AdversarialPage({ caseData }: Props) {
               <button
                 onClick={handleInit}
                 disabled={loading}
-                className="mt-6 rounded-xl bg-green-800 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                className="mt-6 rounded-xl bg-green-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50"
               >
                 {loading ? 'Generando...' : 'Iniciar Simulacion'}
               </button>
@@ -265,11 +264,10 @@ export default function AdversarialPage({ caseData }: Props) {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Rounds */}
             {session.rounds.map(round => (
               <div key={round.number} className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="rounded-full bg-green-800 px-3 py-1 text-xs font-semibold text-white">
+                  <span className="rounded-full bg-green-700 px-3 py-1 text-xs font-semibold text-white">
                     Ronda {round.number}
                   </span>
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${winnerColor(round.round_winner)}`}>
@@ -278,76 +276,70 @@ export default function AdversarialPage({ caseData }: Props) {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  {/* Prosecution panel */}
-                  <div className="rounded-2xl border-l-4 border-red-400 bg-white p-5 shadow-sm">
+                  {/* Prosecution */}
+                  <div className="rounded-2xl border-l-4 border-red-500/60 bg-[#161619] p-5 shadow-lg">
                     <div className="mb-3 flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-red-700">ACUSACION</h3>
+                      <h3 className="text-sm font-semibold text-red-400">ACUSACION</h3>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-gray-500">Fuerza</span>
-                        <div className="flex h-5 w-20 overflow-hidden rounded-full bg-gray-200">
-                          <div
-                            className="h-full rounded-full bg-red-500 transition-all"
-                            style={{ width: `${round.prosecution.strength * 10}%` }}
-                          />
+                        <span className="text-xs text-white/40">Fuerza</span>
+                        <div className="flex h-5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
+                          <div className="h-full rounded-full bg-red-500 transition-all" style={{ width: `${round.prosecution.strength * 10}%` }} />
                         </div>
-                        <span className="text-xs font-bold text-red-700">{round.prosecution.strength}/10</span>
+                        <span className="text-xs font-bold text-red-400">{round.prosecution.strength}/10</span>
                       </div>
                     </div>
-                    <p className="text-sm leading-relaxed text-gray-700">{round.prosecution.argument}</p>
+                    <p className="text-sm leading-relaxed text-white/60">{round.prosecution.argument}</p>
                     {round.prosecution.evidence_refs.length > 0 && (
                       <div className="mt-3 space-y-1">
-                        <p className="text-xs font-medium text-gray-500">Evidencia citada:</p>
+                        <p className="text-xs font-medium text-white/40">Evidencia citada:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {round.prosecution.evidence_refs.map((ref, i) => (
-                            <span key={i} className="rounded-lg bg-red-50 px-2 py-0.5 text-xs text-red-600">{ref}</span>
+                            <span key={i} className="rounded-lg bg-red-900/30 px-2 py-0.5 text-xs text-red-400">{ref}</span>
                           ))}
                         </div>
                       </div>
                     )}
                     {round.prosecution.legal_articles.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        <p className="text-xs font-medium text-gray-500">Articulos legales:</p>
+                        <p className="text-xs font-medium text-white/40">Articulos legales:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {round.prosecution.legal_articles.map((art, i) => (
-                            <span key={i} className="rounded-lg bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{art}</span>
+                            <span key={i} className="rounded-lg bg-white/[0.06] px-2 py-0.5 text-xs text-white/50">{art}</span>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Defense panel */}
-                  <div className="rounded-2xl border-l-4 border-blue-400 bg-white p-5 shadow-sm">
+                  {/* Defense */}
+                  <div className="rounded-2xl border-l-4 border-blue-500/60 bg-[#161619] p-5 shadow-lg">
                     <div className="mb-3 flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-blue-700">DEFENSA</h3>
+                      <h3 className="text-sm font-semibold text-blue-400">DEFENSA</h3>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-gray-500">Fuerza</span>
-                        <div className="flex h-5 w-20 overflow-hidden rounded-full bg-gray-200">
-                          <div
-                            className="h-full rounded-full bg-blue-500 transition-all"
-                            style={{ width: `${round.defense.strength * 10}%` }}
-                          />
+                        <span className="text-xs text-white/40">Fuerza</span>
+                        <div className="flex h-5 w-20 overflow-hidden rounded-full bg-white/[0.06]">
+                          <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${round.defense.strength * 10}%` }} />
                         </div>
-                        <span className="text-xs font-bold text-blue-700">{round.defense.strength}/10</span>
+                        <span className="text-xs font-bold text-blue-400">{round.defense.strength}/10</span>
                       </div>
                     </div>
-                    <p className="text-sm leading-relaxed text-gray-700">{round.defense.counterargument}</p>
+                    <p className="text-sm leading-relaxed text-white/60">{round.defense.counterargument}</p>
                     {round.defense.evidence_refs.length > 0 && (
                       <div className="mt-3 space-y-1">
-                        <p className="text-xs font-medium text-gray-500">Evidencia citada:</p>
+                        <p className="text-xs font-medium text-white/40">Evidencia citada:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {round.defense.evidence_refs.map((ref, i) => (
-                            <span key={i} className="rounded-lg bg-blue-50 px-2 py-0.5 text-xs text-blue-600">{ref}</span>
+                            <span key={i} className="rounded-lg bg-blue-900/30 px-2 py-0.5 text-xs text-blue-400">{ref}</span>
                           ))}
                         </div>
                       </div>
                     )}
                     {round.defense.legal_articles.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        <p className="text-xs font-medium text-gray-500">Articulos legales:</p>
+                        <p className="text-xs font-medium text-white/40">Articulos legales:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {round.defense.legal_articles.map((art, i) => (
-                            <span key={i} className="rounded-lg bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{art}</span>
+                            <span key={i} className="rounded-lg bg-white/[0.06] px-2 py-0.5 text-xs text-white/50">{art}</span>
                           ))}
                         </div>
                       </div>
@@ -357,46 +349,41 @@ export default function AdversarialPage({ caseData }: Props) {
               </div>
             ))}
 
-            {/* Evaluation panel */}
+            {/* Evaluation */}
             {evaluation && (
-              <div className="rounded-2xl border border-green-200 bg-green-50 p-5 shadow-sm space-y-4">
+              <div className="rounded-2xl border border-green-500/20 bg-green-900/15 p-5 shadow-lg space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-green-800">Evaluacion de Fortaleza</h3>
-                  <span className="rounded-full bg-green-200 px-3 py-1 text-sm font-bold text-green-800">
+                  <h3 className="text-base font-semibold text-green-400">Evaluacion de Fortaleza</h3>
+                  <span className="rounded-full bg-green-900/40 px-3 py-1 text-sm font-bold text-green-300">
                     {evaluation.overall_strength}/10
                   </span>
                 </div>
-
-                <p className="text-sm leading-relaxed text-gray-700">{evaluation.summary}</p>
-
+                <p className="text-sm leading-relaxed text-white/60">{evaluation.summary}</p>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-xl bg-white p-4 space-y-2">
-                    <h4 className="text-sm font-semibold text-green-700">Puntos fuertes</h4>
+                  <div className="rounded-xl bg-[#161619] p-4 space-y-2">
+                    <h4 className="text-sm font-semibold text-green-400">Puntos fuertes</h4>
                     <ul className="space-y-1">
                       {evaluation.strong_points.map((p, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                          <span className="mt-0.5 flex-shrink-0 text-green-600">+</span>
-                          {p}
+                        <li key={i} className="flex items-start gap-2 text-sm text-white/60">
+                          <span className="mt-0.5 flex-shrink-0 text-green-400">+</span>{p}
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="rounded-xl bg-white p-4 space-y-2">
-                    <h4 className="text-sm font-semibold text-red-600">Puntos debiles</h4>
+                  <div className="rounded-xl bg-[#161619] p-4 space-y-2">
+                    <h4 className="text-sm font-semibold text-red-400">Puntos debiles</h4>
                     <ul className="space-y-1">
                       {evaluation.weak_points.map((p, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                          <span className="mt-0.5 flex-shrink-0 text-red-500">-</span>
-                          {p}
+                        <li key={i} className="flex items-start gap-2 text-sm text-white/60">
+                          <span className="mt-0.5 flex-shrink-0 text-red-400">-</span>{p}
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
-
-                <div className="rounded-xl bg-white p-4">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-1">Recomendacion</h4>
-                  <p className="text-sm text-gray-600">{evaluation.recommendation}</p>
+                <div className="rounded-xl bg-[#161619] p-4">
+                  <h4 className="text-sm font-semibold text-white/60 mb-1">Recomendacion</h4>
+                  <p className="text-sm text-white/50">{evaluation.recommendation}</p>
                 </div>
               </div>
             )}
@@ -406,7 +393,7 @@ export default function AdversarialPage({ caseData }: Props) {
 
       {/* Action bar */}
       {session && (
-        <div className="flex-shrink-0 border-t border-gray-200 bg-white px-4 py-3 md:px-6">
+        <div className="flex-shrink-0 border-t border-white/[0.08] bg-[#0d0d14] px-4 py-3 md:px-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="flex flex-1 gap-2">
               <input
@@ -415,12 +402,12 @@ export default function AdversarialPage({ caseData }: Props) {
                 onChange={e => setCounterInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleCounter()}
                 placeholder="Escribí tu argumento y la IA lo mejora con evidencia y citas legales..."
-                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none placeholder:text-gray-400"
+                className="flex-1 rounded-xl border border-white/[0.08] bg-[#111114] px-4 py-2.5 text-sm text-white/80 shadow-sm focus:border-green-600 focus:ring-1 focus:ring-green-600 focus:outline-none placeholder:text-white/20"
               />
               <button
                 onClick={handleCounter}
                 disabled={loading || !counterInput.trim()}
-                className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-xl border border-white/[0.08] bg-[#1a1a1e] px-4 py-2.5 text-sm font-medium text-white/60 hover:bg-[#1e1e22] disabled:opacity-50"
               >
                 Contraargumentar
               </button>
@@ -429,21 +416,21 @@ export default function AdversarialPage({ caseData }: Props) {
               <button
                 onClick={handleAutoRound}
                 disabled={loading}
-                className="rounded-xl bg-green-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                className="rounded-xl bg-green-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-600 disabled:opacity-50"
               >
                 {loading ? 'Generando...' : 'Auto-ronda'}
               </button>
               <button
                 onClick={handleEvaluate}
                 disabled={evalLoading}
-                className="rounded-xl border border-green-800 px-4 py-2.5 text-sm font-medium text-green-800 hover:bg-green-50 disabled:opacity-50"
+                className="rounded-xl border border-green-600 px-4 py-2.5 text-sm font-medium text-green-400 hover:bg-green-900/20 disabled:opacity-50"
               >
                 {evalLoading ? 'Evaluando...' : 'Evaluar Fortaleza'}
               </button>
               <button
                 onClick={handleInit}
                 disabled={loading}
-                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-xl border border-white/[0.08] px-4 py-2.5 text-sm font-medium text-white/40 hover:bg-white/[0.04] disabled:opacity-50"
               >
                 Reiniciar
               </button>

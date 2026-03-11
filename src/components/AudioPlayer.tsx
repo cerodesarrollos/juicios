@@ -73,10 +73,10 @@ export default function AudioPlayer({ src, transcription }: Props) {
   return (
     <div className="space-y-2">
       <audio ref={audioRef} src={src} preload="metadata" />
-      <div className="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-200 p-3">
+      <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
         <button
           onClick={togglePlay}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-green-800 text-white hover:bg-green-700 text-sm"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-green-700 text-white hover:bg-green-600 text-sm"
         >
           {playing ? '⏸' : '▶'}
         </button>
@@ -86,21 +86,21 @@ export default function AudioPlayer({ src, transcription }: Props) {
           max={duration || 0}
           value={currentTime}
           onChange={seek}
-          className="flex-1 accent-green-800"
+          className="flex-1 accent-green-600"
         />
-        <span className="text-xs text-gray-500 tabular-nums w-20 text-right">
+        <span className="text-xs text-white/50 tabular-nums w-20 text-right">
           {fmt(currentTime)} / {fmt(duration)}
         </span>
         <button
           onClick={changeSpeed}
-          className="rounded-lg bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-300"
+          className="rounded-lg bg-white/[0.08] px-2 py-1 text-xs font-medium text-white/60 hover:bg-white/[0.12]"
         >
           {speed}x
         </button>
       </div>
       {transcription && (
-        <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-xs text-gray-600">
-          <p className="font-medium text-gray-700 mb-1">Transcripcion:</p>
+        <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3 text-xs text-white/50">
+          <p className="font-medium text-white/60 mb-1">Transcripcion:</p>
           <p className="whitespace-pre-wrap">{transcription}</p>
         </div>
       )}
