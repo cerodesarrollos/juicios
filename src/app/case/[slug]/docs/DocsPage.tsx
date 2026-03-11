@@ -69,15 +69,15 @@ function CSVViewer({ url }: { url: string }) {
       .catch(() => setLoading(false))
   }, [url])
 
-  if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-green-800 border-t-transparent" /></div>
+  if (loading) return <div className="flex justify-center py-8"><div className="h-6 w-6 animate-spin rounded-full border-2 border-green-500 border-t-transparent" /></div>
 
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full text-xs">
         <thead>
-          <tr className="bg-gray-100">
+          <tr className="bg-white/[0.06]">
             {headers.map((h, i) => (
-              <th key={i} className="whitespace-nowrap border-b border-gray-200 px-3 py-2 text-left font-semibold text-gray-700">
+              <th key={i} className="whitespace-nowrap border-b border-white/[0.08] px-3 py-2 text-left font-semibold text-white/70">
                 {h}
               </th>
             ))}
@@ -85,9 +85,9 @@ function CSVViewer({ url }: { url: string }) {
         </thead>
         <tbody>
           {rows.map((row, ri) => (
-            <tr key={ri} className="hover:bg-green-50 transition-colors">
+            <tr key={ri} className="hover:bg-white/[0.04] transition-colors">
               {row.map((cell, ci) => (
-                <td key={ci} className="whitespace-nowrap border-b border-gray-100 px-3 py-1.5 text-gray-600">
+                <td key={ci} className="whitespace-nowrap border-b border-white/[0.05] px-3 py-1.5 text-white/60">
                   {cell}
                 </td>
               ))}
@@ -124,23 +124,23 @@ export default function DocsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+      <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0d0d14] px-4 py-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-sm font-semibold text-gray-800">📋 Documentación Respaldatoria</h1>
+          <h1 className="text-sm font-semibold text-white/80">📋 Documentación Respaldatoria</h1>
           {activeCategory && (
-            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+            <span className="rounded-full bg-green-500/20 px-2.5 py-0.5 text-xs font-medium text-green-400">
               {activeCategory}
             </span>
           )}
         </div>
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-white/30">
           {DOCS.length} documentos
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Document list — left panel */}
-        <div className="w-full md:w-[360px] flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white">
+        <div className="w-full md:w-[360px] flex-shrink-0 overflow-y-auto border-r border-white/[0.08] bg-[#0d0d14]">
           {CATEGORIES.map(cat => {
             const catDocs = DOCS.filter(d => d.category === cat)
             if (catDocs.length === 0) return null
@@ -150,33 +150,33 @@ export default function DocsPage() {
               <div key={cat}>
                 <button
                   onClick={() => setActiveCategory(isActive ? null : cat)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100"
+                  className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-white/[0.04] transition-colors border-b border-white/[0.06]"
                 >
                   <div className="flex items-center gap-2">
                     <span>{CATEGORY_ICONS[cat] || '📄'}</span>
-                    <span className="text-sm font-semibold text-gray-800">{cat}</span>
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
+                    <span className="text-sm font-semibold text-white/80">{cat}</span>
+                    <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[10px] font-medium text-white/50">
                       {catDocs.length}
                     </span>
                   </div>
                   <svg
                     width="12" height="12" viewBox="0 0 12 12" fill="currentColor"
-                    className={`text-gray-400 transition-transform duration-200 ${isActive ? 'rotate-90' : ''}`}
+                    className={`text-white/30 transition-transform duration-200 ${isActive ? 'rotate-90' : ''}`}
                   >
                     <path d="M4 2l5 4-5 4z" />
                   </svg>
                 </button>
 
                 {isActive && (
-                  <div className="bg-gray-50">
+                  <div className="bg-white/[0.02]">
                     {catDocs.map(doc => (
                       <button
                         key={doc.name}
                         onClick={() => setSelectedDoc(doc)}
-                        className={`flex w-full items-center gap-3 px-6 py-2.5 text-left text-xs transition-colors border-b border-gray-100 ${
+                        className={`flex w-full items-center gap-3 px-6 py-2.5 text-left text-xs transition-colors border-b border-white/[0.05] ${
                           selectedDoc?.name === doc.name
-                            ? 'bg-green-50 text-green-800 font-semibold'
-                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                            ? 'bg-green-900/30 text-green-400 font-semibold'
+                            : 'text-white/60 hover:bg-white/[0.04] hover:text-white/80'
                         }`}
                       >
                         <span className="text-base">{doc.type === 'pdf' ? '📄' : '📊'}</span>
@@ -191,30 +191,30 @@ export default function DocsPage() {
 
           {/* Empty categories placeholder */}
           {['Informe Veraz', 'Certificación Notarial'].map(cat => (
-            <div key={cat} className="flex items-center justify-between px-4 py-3 border-b border-gray-100 opacity-50">
+            <div key={cat} className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] opacity-40">
               <div className="flex items-center gap-2">
                 <span>{cat === 'Informe Veraz' ? '📋' : '📝'}</span>
-                <span className="text-sm font-semibold text-gray-500">{cat}</span>
+                <span className="text-sm font-semibold text-white/50">{cat}</span>
               </div>
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400">Pendiente</span>
+              <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[10px] text-white/30">Pendiente</span>
             </div>
           ))}
         </div>
 
         {/* Document viewer — right panel */}
-        <div className="hidden md:flex flex-1 flex-col overflow-hidden bg-gray-50">
+        <div className="hidden md:flex flex-1 flex-col overflow-hidden bg-[#111119]">
           {selectedDoc ? (
             <>
-              <div className="flex items-center justify-between border-b border-gray-200 bg-white px-5 py-3">
+              <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0d0d14] px-5 py-3">
                 <div>
-                  <h2 className="text-sm font-semibold text-gray-800">{selectedDoc.label}</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">{selectedDoc.category}</p>
+                  <h2 className="text-sm font-semibold text-white/80">{selectedDoc.label}</h2>
+                  <p className="text-xs text-white/30 mt-0.5">{selectedDoc.category}</p>
                 </div>
                 <a
                   href={selectedDoc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-lg bg-green-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+                  className="rounded-lg bg-green-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-600 transition-colors"
                 >
                   Abrir ↗
                 </a>
@@ -234,7 +234,7 @@ export default function DocsPage() {
               </div>
             </>
           ) : (
-            <div className="flex h-full flex-col items-center justify-center text-gray-400 p-8">
+            <div className="flex h-full flex-col items-center justify-center text-white/30 p-8">
               <span className="text-5xl mb-4">📂</span>
               <p className="text-sm text-center">Seleccioná un documento para previsualizarlo</p>
             </div>
