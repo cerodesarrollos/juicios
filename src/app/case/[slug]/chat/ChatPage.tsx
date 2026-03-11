@@ -272,21 +272,21 @@ export default function ChatPage({ caseData, chapters, weakPointsCount }: ChatPa
 
         {/* Evidence detail panel — slide-up drawer on mobile, 50% on desktop */}
         <div className={`
-          fixed inset-x-0 bottom-0 z-50 h-[75vh] transform transition-transform duration-300 ease-in-out bg-white rounded-t-2xl shadow-2xl
+          fixed inset-x-0 bottom-0 z-50 h-[75vh] transform transition-transform duration-300 ease-in-out bg-[#0d0d14] rounded-t-2xl shadow-2xl
           md:relative md:inset-auto md:z-auto md:h-auto md:transform-none md:rounded-none md:shadow-none md:flex md:w-1/2 md:flex-col
           ${mobileEvidence ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
         `}>
           {/* Mobile drawer handle */}
-          <div className="flex items-center justify-between border-b border-gray-200 bg-white px-5 py-3 md:rounded-none rounded-t-2xl">
-            <h2 className="text-sm font-semibold text-gray-800">Detalle de Evidencia</h2>
+          <div className="flex items-center justify-between border-b border-white/[0.08] bg-[#0d0d14] px-5 py-3 md:rounded-none rounded-t-2xl">
+            <h2 className="text-sm font-semibold text-white/80">Detalle de Evidencia</h2>
             <button
               onClick={() => setMobileEvidence(false)}
-              className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 md:hidden"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-white/40 hover:bg-white/10 md:hidden"
             >
               ✕
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto bg-[#0d0d14]">
             <ChatEvidencePanel message={selectedMessage} />
           </div>
         </div>

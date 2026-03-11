@@ -23,8 +23,8 @@ function typeLabel(type: string) {
 
 function MetaCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-[14px] bg-white/[0.03] border border-white/[0.05] p-3">
-      <p className="text-[10px] text-white/20 mb-0.5">{label}</p>
+    <div className="rounded-[14px] bg-white/[0.06] border border-white/[0.10] p-3">
+      <p className="text-[10px] text-white/40 mb-0.5">{label}</p>
       {children}
     </div>
   )
@@ -34,7 +34,7 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
   const [lightbox, setLightbox] = useState(false)
   if (!message) {
     return (
-      <div className="flex h-full flex-col items-center justify-center text-white/20 p-8">
+      <div className="flex h-full flex-col items-center justify-center text-white/40 p-8">
         <span className="text-5xl mb-4">🔍</span>
         <p className="text-[13px] text-center">Selecciona un mensaje para ver los detalles</p>
       </div>
@@ -46,37 +46,37 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <span className="rounded-[10px] bg-white/[0.07] border border-white/[0.08] px-2.5 py-1 font-mono text-[13px] font-bold text-white/70">
+          <span className="rounded-[10px] bg-white/[0.10] border border-white/[0.15] px-2.5 py-1 font-mono text-[13px] font-bold text-white/90">
             {message.evidence_id}
           </span>
           <div className="mt-2 flex items-center gap-2">
             <span className="text-xl">{typeIcon(message.message_type)}</span>
-            <span className="text-[13px] font-medium text-white/55">{typeLabel(message.message_type)}</span>
+            <span className="text-[13px] font-medium text-white/70">{typeLabel(message.message_type)}</span>
           </div>
         </div>
         <div className="flex gap-1.5">
-          {message.is_key_evidence && <span className="rounded-full bg-white/[0.06] border border-white/[0.08] px-2.5 py-1 text-[11px] font-semibold text-white/50">Prueba clave</span>}
-          {message.is_weak_point && <span className="rounded-full bg-white/[0.06] border border-white/[0.08] px-2.5 py-1 text-[11px] font-semibold text-white/50">Punto debil</span>}
+          {message.is_key_evidence && <span className="rounded-full bg-yellow-500/20 border border-yellow-500/30 px-2.5 py-1 text-[11px] font-semibold text-yellow-300">⭐ Prueba clave</span>}
+          {message.is_weak_point && <span className="rounded-full bg-red-500/20 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">⚠ Punto debil</span>}
         </div>
       </div>
 
       {/* Meta */}
       <div className="grid grid-cols-2 gap-3">
         <MetaCard label="Fecha">
-          <p className="text-[13px] font-medium text-white/70">{new Date(message.message_date).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
-          <p className="text-[11px] text-white/30">{new Date(message.message_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="text-[13px] font-medium text-white/85">{new Date(message.message_date).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+          <p className="text-[11px] text-white/50">{new Date(message.message_date).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</p>
         </MetaCard>
-        <MetaCard label="Remitente"><p className="text-[13px] font-medium text-white/70">{message.sender}</p></MetaCard>
-        <MetaCard label="Capitulo"><p className="text-[13px] font-medium text-white/70">{message.chapter} - {message.chapter_name}</p></MetaCard>
-        <MetaCard label="Orden"><p className="text-[13px] font-medium text-white/70">#{message.sort_order}</p></MetaCard>
+        <MetaCard label="Remitente"><p className="text-[13px] font-medium text-white/85">{message.sender}</p></MetaCard>
+        <MetaCard label="Capitulo"><p className="text-[13px] font-medium text-white/85">{message.chapter} - {message.chapter_name}</p></MetaCard>
+        <MetaCard label="Orden"><p className="text-[13px] font-medium text-white/85">#{message.sort_order}</p></MetaCard>
       </div>
 
       {/* Message text */}
       {message.message_text && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Mensaje</p>
-          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-[13px] text-white/65 whitespace-pre-wrap">{message.message_text}</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Mensaje</p>
+          <div className="rounded-[14px] border border-white/[0.10] bg-white/[0.04] p-4">
+            <p className="text-[13px] text-white/80 whitespace-pre-wrap">{message.message_text}</p>
           </div>
         </div>
       )}
@@ -84,9 +84,9 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Transcription */}
       {message.transcription && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Transcripcion</p>
-          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-[13px] italic text-white/45 whitespace-pre-wrap">{message.transcription}</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Transcripcion</p>
+          <div className="rounded-[14px] border border-white/[0.10] bg-white/[0.04] p-4">
+            <p className="text-[13px] italic text-white/65 whitespace-pre-wrap">{message.transcription}</p>
           </div>
         </div>
       )}
@@ -94,14 +94,14 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Audio */}
       {message.message_type === 'audio' && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Reproductor</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Reproductor</p>
           {message.file_url ? (
-            <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="rounded-[14px] border border-white/[0.10] bg-white/[0.04] p-4">
               <audio controls preload="metadata" className="w-full"><source src={message.file_url} type="audio/ogg; codecs=opus" /></audio>
-              <p className="mt-2 text-[11px] text-white/20">{message.file_name || 'audio.opus'}</p>
+              <p className="mt-2 text-[11px] text-white/40">{message.file_name || 'audio.opus'}</p>
             </div>
           ) : (
-            <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4 flex items-center justify-center text-[13px] text-white/20">Sin archivo disponible</div>
+            <div className="rounded-[14px] border border-white/[0.10] bg-white/[0.04] p-4 flex items-center justify-center text-[13px] text-white/40">Sin archivo disponible</div>
           )}
         </div>
       )}
@@ -109,13 +109,13 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Image */}
       {message.message_type === 'image' && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Imagen</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Imagen</p>
           {message.file_url ? (
             <>
-              <div className="overflow-hidden rounded-[14px] border border-white/[0.06] cursor-pointer hover:border-white/[0.12] transition-all" onClick={() => setLightbox(true)}>
-                <img src={message.file_url} alt={message.file_name || 'Imagen'} className="w-full object-contain max-h-[400px] opacity-90" />
+              <div className="overflow-hidden rounded-[14px] border border-white/[0.12] cursor-pointer hover:border-white/[0.20] transition-all" onClick={() => setLightbox(true)}>
+                <img src={message.file_url} alt={message.file_name || 'Imagen'} className="w-full object-contain max-h-[400px]" />
               </div>
-              <p className="mt-1 text-[11px] text-white/20">{message.file_name}</p>
+              <p className="mt-1 text-[11px] text-white/40">{message.file_name}</p>
               {lightbox && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4" onClick={() => setLightbox(false)}>
                   <button className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white text-xl hover:bg-white/20" onClick={() => setLightbox(false)}>✕</button>
@@ -124,7 +124,7 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
               )}
             </>
           ) : (
-            <div className="flex h-48 items-center justify-center rounded-[14px] border border-white/[0.06] bg-white/[0.02] text-white/20"><span className="text-4xl">🖼️</span></div>
+            <div className="flex h-48 items-center justify-center rounded-[14px] border border-white/[0.10] bg-white/[0.04] text-white/40"><span className="text-4xl">🖼️</span></div>
           )}
         </div>
       )}
@@ -132,11 +132,11 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Video */}
       {message.message_type === 'video' && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Video</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Video</p>
           {message.file_url ? (
-            <><div className="overflow-hidden rounded-[14px] border border-white/[0.06]"><video src={message.file_url} controls preload="metadata" className="w-full max-h-[400px]" /></div><p className="mt-1 text-[11px] text-white/20">{message.file_name}</p></>
+            <><div className="overflow-hidden rounded-[14px] border border-white/[0.12]"><video src={message.file_url} controls preload="metadata" className="w-full max-h-[400px]" /></div><p className="mt-1 text-[11px] text-white/40">{message.file_name}</p></>
           ) : (
-            <div className="flex h-48 items-center justify-center rounded-[14px] border border-white/[0.06] bg-white/[0.02] text-white/20"><span className="text-4xl">🎬</span></div>
+            <div className="flex h-48 items-center justify-center rounded-[14px] border border-white/[0.10] bg-white/[0.04] text-white/40"><span className="text-4xl">🎬</span></div>
           )}
         </div>
       )}
@@ -144,13 +144,13 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Document */}
       {message.message_type === 'document' && message.file_url && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Documento</p>
-          <div className="overflow-hidden rounded-[14px] border border-white/[0.06]">
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Documento</p>
+          <div className="overflow-hidden rounded-[14px] border border-white/[0.12]">
             <iframe src={message.file_url} className="w-full h-[500px]" title={message.file_name || 'Documento'} />
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-[11px] text-white/20">{message.file_name}</p>
-            <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-medium text-white/40 hover:text-white/60">Abrir ↗</a>
+            <p className="text-[11px] text-white/40">{message.file_name}</p>
+            <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-medium text-white/60 hover:text-white/80">Abrir ↗</a>
           </div>
         </div>
       )}
@@ -158,9 +158,9 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Weak point note */}
       {message.is_weak_point && message.weak_point_note && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/25">Nota punto debil</p>
-          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-[13px] text-white/50">{message.weak_point_note}</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-red-400/60">Nota punto debil</p>
+          <div className="rounded-[14px] border border-red-500/20 bg-red-500/[0.06] p-4">
+            <p className="text-[13px] text-white/70">{message.weak_point_note}</p>
           </div>
         </div>
       )}
@@ -168,9 +168,9 @@ export default function ChatEvidencePanel({ message }: ChatEvidencePanelProps) {
       {/* Notes */}
       {message.notes && (
         <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/20">Notas</p>
-          <div className="rounded-[14px] border border-white/[0.06] bg-white/[0.02] p-4">
-            <p className="text-[13px] text-white/50">{message.notes}</p>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/40">Notas</p>
+          <div className="rounded-[14px] border border-white/[0.10] bg-white/[0.04] p-4">
+            <p className="text-[13px] text-white/70">{message.notes}</p>
           </div>
         </div>
       )}
